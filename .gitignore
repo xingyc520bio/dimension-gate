@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+submissions.db
+.vercel/
+*.bat
+server.py
