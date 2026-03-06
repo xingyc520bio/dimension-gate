@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>维度之门 · 制造业工作流优化 演示</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#EEF1F5; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'DM Sans','PingFang SC',sans-serif; overflow:hidden; }
+
+  .laptop { position:relative; width:900px; }
+  .laptop-screen { background:#fff; border-radius:12px; border:1px solid #CBD5E1; overflow:hidden; box-shadow: 0 25px 80px rgba(20,50,90,.10), 0 4px 20px rgba(0,0,0,.04); }
+  .laptop-base { width:60%; height:12px; margin:0 auto; background:linear-gradient(180deg,#C8CED6,#D8DEE4); border-radius:0 0 8px 8px; }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:#1B2A4A; border-bottom:1px solid #2D3F63; }
+  .topbar-left { display:flex; align-items:center; gap:8px; }
+  .wdot { width:8px; height:8px; border-radius:50%; }
+  .wdot-r { background:#ff5f57; } .wdot-y { background:#ffbd2e; } .wdot-g { background:#28c840; }
+  .topbar-title { font-size:12px; color:#94A3B8; margin-left:12px; font-family:'JetBrains Mono',monospace; }
+  .topbar-right { display:flex; gap:6px; align-items:center; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:#22C55E; animation:pulse-dot 2s infinite; }
+  .status-text { font-size:11px; color:#94A3B8; font-family:'JetBrains Mono',monospace; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .app { height:480px; position:relative; overflow:hidden; }
+  .screen { position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  .screen.active { opacity:1; pointer-events:auto; }
+
+  /* ── BRAND ── */
+  .brand-logo { display:flex; align-items:center; gap:7px; }
+  .brand-icon { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#F97316,#DC2626); display:flex; align-items:center; justify-content:center; }
+  .brand-icon svg { width:16px; height:16px; }
+  .brand-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:#1E293B; letter-spacing:-.02em; }
+  .brand-sub { font-size:9px; color:#64748B; font-family:'JetBrains Mono',monospace; letter-spacing:.03em; }
+
+  /* ═══ SCREEN 1: DASHBOARD ═══ */
+  .s1-main { flex:1; display:flex; }
+  .s1-sidebar { width:180px; background:#F1F5F9; border-right:1px solid #E2E8F0; display:flex; flex-direction:column; }
+  .s1-sidebar-header { padding:14px 14px; border-bottom:1px solid #E2E8F0; }
+  .s1-nav { padding:8px; flex:1; }
+  .s1-nav-item { display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:10px; margin-bottom:4px; cursor:pointer; transition:all .25s; }
+  .s1-nav-item.active { background:#FFF7ED; border:1px solid #FDBA74; }
+  .s1-nav-item:not(.active) { border:1px solid transparent; }
+  .s1-nav-icon { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .s1-nav-icon svg { width:14px; height:14px; }
+  .ic-sched { background:rgba(249,115,22,.12); color:#C2410C; }
+  .ic-qc { background:rgba(59,130,246,.12); color:#1D4ED8; }
+  .ic-flow { background:rgba(16,185,129,.12); color:#047857; }
+  .ic-dash { background:rgba(139,92,246,.12); color:#6D28D9; }
+  .s1-nav-text { font-size:12px; font-weight:600; color:#334155; }
+  .s1-nav-desc { font-size:10px; color:#94A3B8; margin-top:2px; }
+
+  .s1-content { flex:1; display:flex; flex-direction:column; background:#FAFBFC; }
+  .s1-header { padding:14px 20px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between; }
+  .s1-title { font-size:14px; font-weight:700; color:#1E293B; }
+  .s1-date { font-size:11px; color:#94A3B8; font-family:'JetBrains Mono',monospace; }
+
+  .s1-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px 20px; }
+  .kpi-card { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center; opacity:0; transform:translateY(12px); transition:all .4s ease; }
+  .kpi-card.show { opacity:1; transform:translateY(0); }
+  .kpi-val { font-size:22px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+  .kpi-label { font-size:10px; color:#64748B; margin-top:4px; }
+  .kpi-change { font-size:10px; margin-top:4px; font-weight:600; font-family:'JetBrains Mono',monospace; }
+  .kpi-up { color:#16A34A; } .kpi-down { color:#DC2626; }
+
+  .s1-chart-area { flex:1; padding:0 20px 16px; display:flex; gap:14px; }
+  .s1-gantt { flex:2; background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s1-gantt-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between; }
+  .s1-gantt-title { font-size:12px; font-weight:700; color:#334155; }
+  .s1-gantt-badge { font-size:9px; padding:2px 8px; background:#FFF7ED; color:#C2410C; border-radius:10px; border:1px solid #FDBA74; font-family:'JetBrains Mono',monospace; }
+  .s1-gantt-body { flex:1; padding:10px 14px; overflow:hidden; }
+  .gantt-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; opacity:0; transform:translateX(-15px); transition:all .4s ease; }
+  .gantt-row.show { opacity:1; transform:translateX(0); }
+  .gantt-label { width:72px; font-size:10px; color:#64748B; font-family:'JetBrains Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gantt-track { flex:1; height:18px; background:#F1F5F9; border-radius:4px; position:relative; overflow:hidden; }
+  .gantt-bar { position:absolute; top:2px; height:14px; border-radius:3px; transition:width 1s ease; display:flex; align-items:center; padding-left:6px; font-size:8px; color:#fff; font-weight:700; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .gantt-status { font-size:9px; font-weight:600; padding:2px 6px; border-radius:6px; }
+  .st-run { background:#DCFCE7; color:#16A34A; }
+  .st-wait { background:#FEF3C7; color:#D97706; }
+  .st-done { background:#E0E7FF; color:#4338CA; }
+
+  .s1-alerts { flex:1; background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s1-alerts-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; font-size:12px; font-weight:700; color:#334155; }
+  .s1-alerts-body { flex:1; padding:8px; overflow:hidden; }
+  .alert-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; margin-bottom:6px; opacity:0; transform:translateY(8px); transition:all .4s ease; font-size:11px; line-height:1.5; }
+  .alert-item.show { opacity:1; transform:translateY(0); }
+  .alert-icon { flex-shrink:0; font-size:14px; }
+  .alert-warn { background:#FFF7ED; border:1px solid #FED7AA; color:#9A3412; }
+  .alert-ok { background:#F0FDF4; border:1px solid #BBF7D0; color:#166534; }
+  .alert-info { background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF; }
+
+  /* ═══ SCREEN 2: SCHEDULING ═══ */
+  .s2-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#FFF7ED; border-bottom:1px solid #FDBA74; }
+  .s2-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E2E8F0; font-size:11px; color:#64748B; cursor:pointer; }
+  .s2-title { font-size:13px; font-weight:700; color:#9A3412; flex:1; }
+  .s2-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#FFF7ED; color:#C2410C; border:1px solid #FDBA74; font-family:'JetBrains Mono',monospace; }
+
+  .s2-content { flex:1; display:flex; padding:16px 20px; gap:16px; background:#FAFBFC; }
+  .s2-left { flex:1; display:flex; flex-direction:column; gap:12px; }
+  .s2-erp-card { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; }
+  .s2-erp-card h5 { font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:6px; }
+  .s2-erp-card h5 .dot-live { width:6px; height:6px; border-radius:50%; background:#22C55E; animation:pulse-dot 2s infinite; }
+  .erp-table { width:100%; border-collapse:collapse; }
+  .erp-table th { font-size:9px; color:#94A3B8; text-align:left; padding:4px 8px; border-bottom:1px solid #E2E8F0; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; }
+  .erp-table td { font-size:11px; color:#334155; padding:6px 8px; border-bottom:1px solid #F1F5F9; font-family:'JetBrains Mono',monospace; }
+  .erp-row { opacity:0; transform:translateX(-10px); transition:all .35s ease; }
+  .erp-row.show { opacity:1; transform:translateX(0); }
+  .erp-priority { font-size:9px; padding:1px 6px; border-radius:4px; font-weight:600; }
+  .pri-high { background:#FEE2E2; color:#DC2626; }
+  .pri-mid { background:#FEF3C7; color:#D97706; }
+  .pri-low { background:#DCFCE7; color:#16A34A; }
+
+  .s2-gantt-full { flex:1; background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s2-gantt-full-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between; }
+  .s2-gantt-full-title { font-size:12px; font-weight:700; color:#334155; }
+  .s2-gantt-full-body { flex:1; position:relative; padding:10px 14px; }
+  .gantt-timeline { display:flex; justify-content:space-between; font-size:8px; color:#94A3B8; font-family:'JetBrains Mono',monospace; margin-bottom:6px; padding:0 72px 0 0; }
+  .gantt2-row { display:flex; align-items:center; gap:6px; margin-bottom:5px; opacity:0; transform:translateX(-10px); transition:all .4s ease; }
+  .gantt2-row.show { opacity:1; transform:translateX(0); }
+  .gantt2-label { width:68px; font-size:9px; color:#64748B; font-family:'JetBrains Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gantt2-track { flex:1; height:22px; background:#F8FAFC; border-radius:4px; position:relative; border:1px solid #E2E8F0; }
+  .gantt2-bar { position:absolute; top:3px; height:14px; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:7px; color:#fff; font-weight:700; font-family:'JetBrains Mono',monospace; transition:all .8s ease; }
+
+  .s2-right { width:200px; display:flex; flex-direction:column; gap:12px; }
+  .s2-metric { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center; }
+  .s2-metric h5 { font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .s2-metric-val { font-size:28px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+  .s2-metric-sub { font-size:10px; color:#64748B; margin-top:4px; }
+  .s2-metric-bar { height:6px; background:#E2E8F0; border-radius:3px; margin-top:8px; overflow:hidden; }
+  .s2-metric-fill { height:100%; border-radius:3px; transition:width 1.5s ease; }
+
+  .s2-ai-log { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; flex:1; overflow:hidden; }
+  .s2-ai-log h5 { font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .ai-log-item { font-size:10px; font-family:'JetBrains Mono',monospace; line-height:1.7; color:#475569; padding:3px 0; border-bottom:1px solid #F8FAFC; opacity:0; transform:translateY(5px); transition:all .3s ease; }
+  .ai-log-item.show { opacity:1; transform:translateY(0); }
+  .ai-log-item .log-time { color:#94A3B8; margin-right:6px; }
+  .ai-log-item .log-ok { color:#16A34A; } .ai-log-item .log-warn { color:#D97706; }
+
+  /* ═══ SCREEN 3: QUALITY INSPECTION ═══ */
+  .s3-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#EFF6FF; border-bottom:1px solid #BFDBFE; }
+  .s3-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E2E8F0; font-size:11px; color:#64748B; cursor:pointer; }
+  .s3-title { font-size:13px; font-weight:700; color:#1E40AF; flex:1; }
+  .s3-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; font-family:'JetBrains Mono',monospace; }
+
+  .s3-content { flex:1; display:flex; padding:16px 20px; gap:16px; background:#FAFBFC; }
+  .s3-inspect-area { flex:1; background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s3-inspect-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between; }
+  .s3-inspect-title { font-size:12px; font-weight:700; color:#334155; }
+  .s3-inspect-cam { font-size:9px; padding:2px 8px; background:#DCFCE7; color:#166534; border-radius:10px; border:1px solid #BBF7D0; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:4px; }
+  .s3-inspect-cam .cam-dot { width:5px; height:5px; border-radius:50%; background:#22C55E; animation:pulse-dot 1.5s infinite; }
+  .s3-canvas-wrap { flex:1; position:relative; background:#0F172A; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .s3-canvas-wrap canvas { width:100%; height:100%; }
+  .s3-scan-line { position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#3B82F6,transparent); opacity:0; transition:opacity .3s; }
+  .s3-scan-line.active { opacity:1; animation:scan-sweep 2s linear; }
+  @keyframes scan-sweep { 0%{top:10%;} 100%{top:90%;} }
+  .s3-defect-box { position:absolute; border:2px solid #EF4444; border-radius:4px; opacity:0; transition:all .4s ease; }
+  .s3-defect-box.show { opacity:1; animation:defect-pulse 1s ease-in-out infinite; }
+  @keyframes defect-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4);} 50%{box-shadow:0 0 0 6px rgba(239,68,68,0);} }
+  .s3-defect-label { position:absolute; top:-20px; left:0; font-size:9px; color:#fff; background:#EF4444; padding:1px 6px; border-radius:3px; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .s3-ok-stamp { position:absolute; font-size:32px; font-weight:900; color:#22C55E; opacity:0; transform:scale(2) rotate(-15deg); transition:all .5s ease; font-family:'Syne',sans-serif; letter-spacing:4px; border:3px solid #22C55E; padding:4px 16px; border-radius:8px; }
+  .s3-ok-stamp.show { opacity:.7; transform:scale(1) rotate(-15deg); }
+
+  .s3-right { width:220px; display:flex; flex-direction:column; gap:12px; }
+  .s3-result { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; }
+  .s3-result h5 { font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .s3-result-item { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #F1F5F9; font-size:11px; opacity:0; transform:translateX(10px); transition:all .4s ease; }
+  .s3-result-item.show { opacity:1; transform:translateX(0); }
+  .s3-result-label { color:#64748B; }
+  .s3-result-val { font-weight:700; font-family:'JetBrains Mono',monospace; }
+  .val-pass { color:#16A34A; } .val-fail { color:#DC2626; } .val-warn { color:#D97706; }
+
+  .s3-history { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; flex:1; overflow:hidden; }
+  .s3-history h5 { font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .s3-hist-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #F8FAFC; font-size:10px; font-family:'JetBrains Mono',monospace; opacity:0; transition:all .3s ease; }
+  .s3-hist-row.show { opacity:1; }
+  .hist-id { color:#94A3B8; width:60px; }
+  .hist-result { padding:1px 6px; border-radius:4px; font-weight:600; font-size:9px; }
+  .hist-pass { background:#DCFCE7; color:#16A34A; }
+  .hist-fail { background:#FEE2E2; color:#DC2626; }
+  .hist-time { color:#CBD5E1; margin-left:auto; }
+
+  /* ═══ SCREEN 4: PROCESS DIGITIZATION ═══ */
+  .s4-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#ECFDF5; border-bottom:1px solid #A7F3D0; }
+  .s4-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E2E8F0; font-size:11px; color:#64748B; cursor:pointer; }
+  .s4-title { font-size:13px; font-weight:700; color:#047857; flex:1; }
+  .s4-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; font-family:'JetBrains Mono',monospace; }
+
+  .s4-content { flex:1; display:flex; flex-direction:column; padding:16px 20px; gap:16px; background:#FAFBFC; }
+  .s4-transform { display:flex; align-items:stretch; gap:16px; }
+  .s4-paper { flex:1; background:#FFF; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s4-paper-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:8px; }
+  .s4-paper-header-icon { font-size:14px; }
+  .s4-paper-title { font-size:12px; font-weight:700; color:#334155; }
+  .s4-paper-tag { font-size:9px; padding:2px 8px; background:#FEE2E2; color:#DC2626; border-radius:10px; border:1px solid #FECACA; font-family:'JetBrains Mono',monospace; margin-left:auto; }
+  .s4-paper-body { flex:1; padding:14px; background:#FFFBF0; font-size:11px; line-height:1.8; color:#78716C; }
+  .sop-line { padding:3px 0; border-bottom:1px dashed #E7E5E4; opacity:0; transition:all .4s ease; }
+  .sop-line.show { opacity:1; }
+  .sop-line.scanned { background:rgba(249,115,22,.08); color:#9A3412; }
+
+  .s4-arrow { display:flex; align-items:center; justify-content:center; font-size:28px; color:#F97316; flex-shrink:0; width:40px; }
+  .s4-arrow-anim { animation:arrow-pulse 1.5s ease-in-out infinite; }
+  @keyframes arrow-pulse { 0%,100%{transform:translateX(0);opacity:.5;} 50%{transform:translateX(4px);opacity:1;} }
+
+  .s4-digital { flex:1; background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s4-digital-header { padding:10px 14px; border-bottom:1px solid #E2E8F0; display:flex; align-items:center; gap:8px; }
+  .s4-digital-icon { font-size:14px; }
+  .s4-digital-title { font-size:12px; font-weight:700; color:#334155; }
+  .s4-digital-tag { font-size:9px; padding:2px 8px; background:#DCFCE7; color:#16A34A; border-radius:10px; border:1px solid #BBF7D0; font-family:'JetBrains Mono',monospace; margin-left:auto; }
+  .s4-digital-body { flex:1; padding:14px; overflow:hidden; }
+  .flow-step { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; margin-bottom:6px; border:1px solid #E2E8F0; opacity:0; transform:translateY(8px); transition:all .4s ease; }
+  .flow-step.show { opacity:1; transform:translateY(0); }
+  .flow-step.active-step { border-color:#F97316; background:#FFF7ED; }
+  .flow-step.done-step { border-color:#22C55E; background:#F0FDF4; }
+  .flow-num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; flex-shrink:0; background:#F1F5F9; color:#64748B; }
+  .flow-step.done-step .flow-num { background:#DCFCE7; color:#16A34A; }
+  .flow-step.active-step .flow-num { background:#FFF7ED; color:#F97316; }
+  .flow-text { font-size:11px; color:#334155; flex:1; }
+  .flow-status { font-size:9px; font-weight:600; font-family:'JetBrains Mono',monospace; padding:2px 6px; border-radius:4px; }
+  .fs-done { background:#DCFCE7; color:#16A34A; }
+  .fs-active { background:#FFF7ED; color:#F97316; }
+  .fs-wait { background:#F1F5F9; color:#94A3B8; }
+
+  .s4-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .s4-stat { background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center; opacity:0; transform:translateY(10px); transition:all .4s ease; }
+  .s4-stat.show { opacity:1; transform:translateY(0); }
+  .s4-stat-val { font-size:22px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+  .s4-stat-label { font-size:10px; color:#64748B; margin-top:4px; }
+  .s4-stat-change { font-size:10px; font-weight:600; margin-top:4px; font-family:'JetBrains Mono',monospace; }
+
+  .click-ripple { position:absolute; width:24px; height:24px; border-radius:50%; background:rgba(249,115,22,.3); border:2px solid rgba(249,115,22,.6); pointer-events:none; z-index:999; animation:ripple .6s ease-out forwards; }
+  @keyframes ripple { 0%{transform:scale(0);opacity:1;} 100%{transform:scale(2.5);opacity:0;} }
+
+  .cursor-pointer { position:absolute; z-index:1000; pointer-events:none; width:20px; height:20px; transition:left .6s cubic-bezier(.4,0,.2,1), top .6s cubic-bezier(.4,0,.2,1); opacity:0; }
+  .cursor-pointer.show { opacity:1; }
+  .cursor-pointer svg { width:20px; height:20px; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.2)); }
+
+  .typing-cursor { display:inline-block; width:2px; height:12px; background:#F97316; margin-left:2px; animation:blink-cursor .6s infinite; vertical-align:text-bottom; }
+  @keyframes blink-cursor { 0%,100%{opacity:1;} 50%{opacity:0;} }
+</style>
+</head>
+<body>
+
+<div class="laptop">
+  <div class="laptop-screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="wdot wdot-r"></div><div class="wdot wdot-y"></div><div class="wdot wdot-g"></div>
+        <span class="topbar-title">维度之门 · 制造业工作流优化 MFG-Agent</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-dot"></div>
+        <span class="status-text">Agent 运行中</span>
+      </div>
+    </div>
+    <div class="app" id="app">
+
+      <!-- ═══ SCREEN 1: DASHBOARD ═══ -->
+      <div class="screen active" id="screen1">
+        <div class="s1-main">
+          <div class="s1-sidebar">
+            <div class="s1-sidebar-header">
+              <div class="brand-logo">
+                <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 20h20"/><path d="M5 20V8l4-4h6l4 4v12"/><rect x="9" y="12" width="6" height="8" rx="1"/></svg></div>
+                <div>
+                  <div class="brand-name">MFG Agent</div>
+                  <div class="brand-sub">制造业优化</div>
+                </div>
+              </div>
+            </div>
+            <div class="s1-nav">
+              <div class="s1-nav-item active" id="nav-sched">
+                <div class="s1-nav-icon ic-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                <div><div class="s1-nav-text">排程中心</div><div class="s1-nav-desc">智能排产调度</div></div>
+              </div>
+              <div class="s1-nav-item" id="nav-qc">
+                <div class="s1-nav-icon ic-qc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+                <div><div class="s1-nav-text">质检监控</div><div class="s1-nav-desc">AI 视觉质检</div></div>
+              </div>
+              <div class="s1-nav-item" id="nav-flow">
+                <div class="s1-nav-icon ic-flow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+                <div><div class="s1-nav-text">流程管理</div><div class="s1-nav-desc">SOP 数字化</div></div>
+              </div>
+              <div class="s1-nav-item" id="nav-dash">
+                <div class="s1-nav-icon ic-dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+                <div><div class="s1-nav-text">数据看板</div><div class="s1-nav-desc">全局数据总览</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="s1-content">
+            <div class="s1-header">
+              <div class="s1-title">生产监控看板</div>
+              <div class="s1-date">2026-03-06 14:32</div>
+            </div>
+            <div class="s1-kpis" id="s1-kpis">
+              <div class="kpi-card" id="kpi-0"><div class="kpi-val" style="color:#F97316;">96.8%</div><div class="kpi-label">设备综合效率 OEE</div><div class="kpi-change kpi-up">+3.2%</div></div>
+              <div class="kpi-card" id="kpi-1"><div class="kpi-val" style="color:#2563EB;">12</div><div class="kpi-label">今日工单</div><div class="kpi-change kpi-up">5 已完成</div></div>
+              <div class="kpi-card" id="kpi-2"><div class="kpi-val" style="color:#16A34A;">99.4%</div><div class="kpi-label">质检合格率</div><div class="kpi-change kpi-up">+0.8%</div></div>
+              <div class="kpi-card" id="kpi-3"><div class="kpi-val" style="color:#8B5CF6;">80%</div><div class="kpi-label">协调效率提升</div><div class="kpi-change kpi-up">AI 排程</div></div>
+            </div>
+            <div class="s1-chart-area">
+              <div class="s1-gantt">
+                <div class="s1-gantt-header">
+                  <div class="s1-gantt-title">实时产线甘特图</div>
+                  <div class="s1-gantt-badge">LIVE</div>
+                </div>
+                <div class="s1-gantt-body" id="s1-gantt-body"></div>
+              </div>
+              <div class="s1-alerts">
+                <div class="s1-alerts-header">异常告警</div>
+                <div class="s1-alerts-body" id="s1-alerts-body"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 2: SCHEDULING ═══ -->
+      <div class="screen" id="screen2">
+        <div class="s2-toolbar">
+          <div class="s2-back">&larr; 返回</div>
+          <div class="s2-title">智能排程 Agent · ERP/MES 自动对接</div>
+          <div class="s2-badge">SCHEDULING</div>
+        </div>
+        <div class="s2-content">
+          <div class="s2-left">
+            <div class="s2-erp-card">
+              <h5><span class="dot-live"></span> ERP 工单数据 · 实时同步</h5>
+              <table class="erp-table">
+                <thead><tr><th>工单号</th><th>产品</th><th>数量</th><th>交期</th><th>优先级</th></tr></thead>
+                <tbody id="erp-tbody"></tbody>
+              </table>
+            </div>
+            <div class="s2-gantt-full">
+              <div class="s2-gantt-full-header">
+                <div class="s2-gantt-full-title">AI 最优排产方案</div>
+                <div class="s1-gantt-badge">AI 生成</div>
+              </div>
+              <div class="s2-gantt-full-body" id="s2-gantt-body">
+                <div class="gantt-timeline" id="gantt-timeline"></div>
+              </div>
+            </div>
+          </div>
+          <div class="s2-right">
+            <div class="s2-metric">
+              <h5>人工协调减少</h5>
+              <div class="s2-metric-val" style="color:#F97316;" id="metric-coord">0%</div>
+              <div class="s2-metric-sub">对比传统排产</div>
+              <div class="s2-metric-bar"><div class="s2-metric-fill" id="metric-coord-bar" style="width:0%;background:#F97316;"></div></div>
+            </div>
+            <div class="s2-metric">
+              <h5>产线利用率</h5>
+              <div class="s2-metric-val" style="color:#2563EB;" id="metric-util">0%</div>
+              <div class="s2-metric-sub">五轴 / 数控 / 装配</div>
+              <div class="s2-metric-bar"><div class="s2-metric-fill" id="metric-util-bar" style="width:0%;background:#2563EB;"></div></div>
+            </div>
+            <div class="s2-ai-log">
+              <h5>AI 决策日志</h5>
+              <div id="ai-log-body"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 3: QUALITY INSPECTION ═══ -->
+      <div class="screen" id="screen3">
+        <div class="s3-toolbar">
+          <div class="s3-back">&larr; 返回</div>
+          <div class="s3-title">质检 AI 辅助 · 视觉识别系统</div>
+          <div class="s3-badge">VISION AI</div>
+        </div>
+        <div class="s3-content">
+          <div class="s3-inspect-area">
+            <div class="s3-inspect-header">
+              <div class="s3-inspect-title">工位 #3 — CNC 精密零件检测</div>
+              <div class="s3-inspect-cam"><span class="cam-dot"></span>Camera-03 LIVE</div>
+            </div>
+            <div class="s3-canvas-wrap" id="s3-canvas-wrap">
+              <canvas id="qcCanvas"></canvas>
+              <div class="s3-scan-line" id="scan-line"></div>
+              <div class="s3-ok-stamp" id="ok-stamp">PASS</div>
+            </div>
+          </div>
+          <div class="s3-right">
+            <div class="s3-result">
+              <h5>检测结果</h5>
+              <div id="s3-results"></div>
+            </div>
+            <div class="s3-history">
+              <h5>最近检测记录</h5>
+              <div id="s3-history"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 4: PROCESS DIGITIZATION ═══ -->
+      <div class="screen" id="screen4">
+        <div class="s4-toolbar">
+          <div class="s4-back">&larr; 返回</div>
+          <div class="s4-title">流程数字化 Agent · SOP 智能转化</div>
+          <div class="s4-badge">DIGITIZATION</div>
+        </div>
+        <div class="s4-content">
+          <div class="s4-transform">
+            <div class="s4-paper">
+              <div class="s4-paper-header">
+                <span class="s4-paper-header-icon">📋</span>
+                <span class="s4-paper-title">纸质 SOP 原件</span>
+                <span class="s4-paper-tag">手写/纸质</span>
+              </div>
+              <div class="s4-paper-body" id="sop-paper"></div>
+            </div>
+            <div class="s4-arrow" id="s4-arrow">
+              <span>→</span>
+            </div>
+            <div class="s4-digital">
+              <div class="s4-digital-header">
+                <span class="s4-digital-icon">📱</span>
+                <span class="s4-digital-title">数字化工作流</span>
+                <span class="s4-digital-tag">可追踪</span>
+              </div>
+              <div class="s4-digital-body" id="sop-digital"></div>
+            </div>
+          </div>
+          <div class="s4-stats-row" id="s4-stats"></div>
+        </div>
+      </div>
+
+      <div class="cursor-pointer" id="cursor">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 3l14 8-6.5 2L8 19.5V3z" fill="#1E293B" stroke="#fff" stroke-width="1"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="laptop-base"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function showClick(x,y){
+  const r=document.createElement('div');
+  r.className='click-ripple';
+  r.style.left=(x-12)+'px'; r.style.top=(y-12)+'px';
+  $('app').appendChild(r);
+  setTimeout(()=>r.remove(),600);
+}
+function moveCursor(x,y){ const c=$('cursor'); c.classList.add('show'); c.style.left=x+'px'; c.style.top=y+'px'; }
+function hideCursor(){ $('cursor').classList.remove('show'); }
+function switchScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
+
+// ═══ SCREEN 1: Dashboard ═══
+const ganttData = [
+  { label:'CNC-01 五轴', left:0, width:45, color:'#F97316', text:'WO-2401 轴承座', status:'运行中', stClass:'st-run' },
+  { label:'CNC-02 车削', left:10, width:35, color:'#2563EB', text:'WO-2402 法兰盘', status:'运行中', stClass:'st-run' },
+  { label:'CNC-03 铣削', left:0, width:55, color:'#8B5CF6', text:'WO-2403 齿轮箱', status:'运行中', stClass:'st-run' },
+  { label:'装配线 A', left:50, width:30, color:'#16A34A', text:'WO-2404 总装', status:'等待中', stClass:'st-wait' },
+  { label:'装配线 B', left:0, width:25, color:'#EC4899', text:'WO-2399 包装', status:'已完成', stClass:'st-done' },
+  { label:'热处理炉', left:30, width:20, color:'#06B6D4', text:'WO-2405 淬火', status:'等待中', stClass:'st-wait' },
+];
+
+const alertData = [
+  { icon:'⚠️', cls:'alert-warn', text:'CNC-03 主轴温度 78°C，接近预警阈值 80°C' },
+  { icon:'✅', cls:'alert-ok', text:'WO-2399 包装完成，已自动入库通知 ERP' },
+  { icon:'ℹ️', cls:'alert-info', text:'AI 建议：WO-2404 提前至 15:00 开始可节省 2h' },
+];
+
+async function animateDashboard(){
+  // KPIs
+  for(let i=0;i<4;i++){
+    await wait(150);
+    $('kpi-'+i).classList.add('show');
+  }
+  await wait(300);
+
+  // Gantt
+  const gb=$('s1-gantt-body');
+  gb.innerHTML='';
+  for(const g of ganttData){
+    const row=document.createElement('div');
+    row.className='gantt-row';
+    row.innerHTML=`<div class="gantt-label">${g.label}</div><div class="gantt-track"><div class="gantt-bar" style="left:${g.left}%;width:0%;background:${g.color};">${g.text}</div></div><div class="gantt-status ${g.stClass}">${g.status}</div>`;
+    gb.appendChild(row);
+    await wait(120);
+    row.classList.add('show');
+    await wait(80);
+    row.querySelector('.gantt-bar').style.width=g.width+'%';
+  }
+  await wait(300);
+
+  // Alerts
+  const ab=$('s1-alerts-body');
+  ab.innerHTML='';
+  for(const a of alertData){
+    const div=document.createElement('div');
+    div.className=`alert-item ${a.cls}`;
+    div.innerHTML=`<span class="alert-icon">${a.icon}</span><span>${a.text}</span>`;
+    ab.appendChild(div);
+    await wait(300);
+    div.classList.add('show');
+  }
+}
+
+// ═══ SCREEN 2: Scheduling ═══
+const erpOrders = [
+  { id:'WO-2406', product:'304不锈钢轴承座', qty:'2,000', due:'03-08', pri:'high' },
+  { id:'WO-2407', product:'铝合金散热器壳体', qty:'5,000', due:'03-10', pri:'high' },
+  { id:'WO-2408', product:'碳钢法兰连接件', qty:'3,000', due:'03-12', pri:'mid' },
+  { id:'WO-2409', product:'精密齿轮组件', qty:'800', due:'03-15', pri:'mid' },
+  { id:'WO-2410', product:'电子连接器外壳', qty:'10,000', due:'03-09', pri:'high' },
+];
+
+const gantt2Data = [
+  { label:'五轴-01', bars:[{left:0,width:25,color:'#F97316',text:'WO-2406'},{left:28,width:30,color:'#8B5CF6',text:'WO-2409'}] },
+  { label:'车削-02', bars:[{left:0,width:35,color:'#2563EB',text:'WO-2407'}] },
+  { label:'铣削-03', bars:[{left:5,width:25,color:'#16A34A',text:'WO-2408'},{left:35,width:20,color:'#EC4899',text:'WO-2410'}] },
+  { label:'装配线A', bars:[{left:30,width:30,color:'#06B6D4',text:'WO-2406装配'}] },
+  { label:'热处理', bars:[{left:20,width:15,color:'#D97706',text:'WO-2408淬火'}] },
+];
+
+const aiLogs = [
+  { time:'14:32:01', text:'读取 ERP 新增工单 5 条', cls:'log-ok' },
+  { time:'14:32:03', text:'分析设备负载与产能约束...', cls:'' },
+  { time:'14:32:05', text:'WO-2410 紧急插单，优先级提升', cls:'log-warn' },
+  { time:'14:32:08', text:'生成最优排产方案 (遗传算法)', cls:'log-ok' },
+  { time:'14:32:10', text:'产线利用率 94.2%，冲突 0', cls:'log-ok' },
+];
+
+async function animateScheduling(){
+  // ERP table rows
+  const tbody=$('erp-tbody');
+  tbody.innerHTML='';
+  for(const o of erpOrders){
+    const tr=document.createElement('tr');
+    tr.className='erp-row';
+    const priLabel = o.pri==='high'?'紧急':o.pri==='mid'?'中等':'常规';
+    tr.innerHTML=`<td>${o.id}</td><td>${o.product}</td><td>${o.qty}</td><td>${o.due}</td><td><span class="erp-priority pri-${o.pri}">${priLabel}</span></td>`;
+    tbody.appendChild(tr);
+    await wait(200);
+    tr.classList.add('show');
+  }
+  await wait(400);
+
+  // Timeline
+  const tl=$('gantt-timeline');
+  tl.innerHTML='';
+  ['06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'].forEach(t=>{
+    const s=document.createElement('span');
+    s.textContent=t;
+    tl.appendChild(s);
+  });
+
+  // Gantt bars
+  const gb=$('s2-gantt-body');
+  // remove old rows
+  gb.querySelectorAll('.gantt2-row').forEach(r=>r.remove());
+  for(const g of gantt2Data){
+    const row=document.createElement('div');
+    row.className='gantt2-row';
+    let barsHTML='';
+    g.bars.forEach(b=>{
+      barsHTML+=`<div class="gantt2-bar" style="left:${b.left}%;width:0%;background:${b.color};">${b.text}</div>`;
+    });
+    row.innerHTML=`<div class="gantt2-label">${g.label}</div><div class="gantt2-track">${barsHTML}</div>`;
+    gb.appendChild(row);
+    await wait(150);
+    row.classList.add('show');
+    await wait(100);
+    row.querySelectorAll('.gantt2-bar').forEach((bar,i)=>{
+      bar.style.width=g.bars[i].width+'%';
+    });
+  }
+
+  // Metrics animation
+  await wait(300);
+  animateMetric('metric-coord','metric-coord-bar',80,'%');
+  animateMetric('metric-util','metric-util-bar',94.2,'%');
+
+  // AI logs
+  const logBody=$('ai-log-body');
+  logBody.innerHTML='';
+  for(const l of aiLogs){
+    const div=document.createElement('div');
+    div.className='ai-log-item';
+    div.innerHTML=`<span class="log-time">${l.time}</span><span class="${l.cls}">${l.text}</span>`;
+    logBody.appendChild(div);
+    await wait(350);
+    div.classList.add('show');
+  }
+}
+
+function animateMetric(valId,barId,target,suffix){
+  let current=0;
+  const el=$(valId);
+  const bar=$(barId);
+  const step=target/30;
+  const iv=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=current.toFixed(current>=10?1:1)+suffix;
+    bar.style.width=current+'%';
+    if(current>=target) clearInterval(iv);
+  },50);
+}
+
+// ═══ SCREEN 3: Quality Inspection ═══
+function initQCCanvas(){
+  const canvas=$('qcCanvas');
+  const wrap=canvas.parentElement;
+  canvas.width=wrap.clientWidth||500;
+  canvas.height=wrap.clientHeight||300;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  // Draw a stylized CNC part
+  ctx.fillStyle='#1E293B';
+  ctx.fillRect(0,0,W,H);
+
+  // Grid background
+  ctx.strokeStyle='rgba(100,116,139,.15)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Main part body
+  const cx=W/2, cy=H/2;
+  ctx.fillStyle='#64748B';
+  ctx.beginPath();
+  ctx.roundRect(cx-90,cy-60,180,120,8);
+  ctx.fill();
+  ctx.strokeStyle='#94A3B8';
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+
+  // Inner circle (bearing hole)
+  ctx.beginPath();
+  ctx.arc(cx,cy,35,0,Math.PI*2);
+  ctx.fillStyle='#475569';
+  ctx.fill();
+  ctx.strokeStyle='#CBD5E1';
+  ctx.lineWidth=1;
+  ctx.stroke();
+
+  // Inner inner circle
+  ctx.beginPath();
+  ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.fillStyle='#334155';
+  ctx.fill();
+  ctx.strokeStyle='#94A3B8';
+  ctx.stroke();
+
+  // Bolt holes
+  [{x:cx-60,y:cy-35},{x:cx+60,y:cy-35},{x:cx-60,y:cy+35},{x:cx+60,y:cy+35}].forEach(p=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle='#1E293B';ctx.fill();ctx.strokeStyle='#64748B';ctx.stroke();
+  });
+
+  // Dimension lines
+  ctx.setLineDash([3,3]);
+  ctx.strokeStyle='#38BDF8';
+  ctx.lineWidth=1;
+  // width dim
+  ctx.beginPath();ctx.moveTo(cx-90,cy+80);ctx.lineTo(cx+90,cy+80);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-90,cy+60);ctx.lineTo(cx-90,cy+85);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+90,cy+60);ctx.lineTo(cx+90,cy+85);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#38BDF8';ctx.font='10px JetBrains Mono';
+  ctx.fillText('120.00 ±0.02',cx-30,cy+78);
+
+  // height dim
+  ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(cx+110,cy-60);ctx.lineTo(cx+110,cy+60);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+90,cy-60);ctx.lineTo(cx+115,cy-60);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+90,cy+60);ctx.lineTo(cx+115,cy+60);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.save();
+  ctx.translate(cx+108,cy+10);ctx.rotate(-Math.PI/2);
+  ctx.fillText('80.00 ±0.02',0,0);
+  ctx.restore();
+
+  // Part label
+  ctx.fillStyle='#F97316';ctx.font='bold 11px JetBrains Mono';
+  ctx.fillText('Part: WO-2401-A03',20,25);
+  ctx.fillStyle='#94A3B8';ctx.font='10px JetBrains Mono';
+  ctx.fillText('Material: 304SS | Batch: B2026-0306',20,40);
+}
+
+const qcResults = [
+  { label:'外径尺寸', val:'120.01mm', cls:'val-pass' },
+  { label:'内径尺寸', val:'36.00mm', cls:'val-pass' },
+  { label:'表面粗糙度', val:'Ra 0.72', cls:'val-pass' },
+  { label:'圆度公差', val:'0.008mm', cls:'val-pass' },
+  { label:'外观缺陷', val:'无', cls:'val-pass' },
+];
+
+const qcHistory = [
+  { id:'WO-2401-A02', result:'PASS', cls:'hist-pass', time:'14:28' },
+  { id:'WO-2401-A01', result:'PASS', cls:'hist-pass', time:'14:25' },
+  { id:'WO-2400-B12', result:'FAIL', cls:'hist-fail', time:'14:20' },
+  { id:'WO-2400-B11', result:'PASS', cls:'hist-pass', time:'14:16' },
+  { id:'WO-2400-B10', result:'PASS', cls:'hist-pass', time:'14:12' },
+  { id:'WO-2399-C08', result:'PASS', cls:'hist-pass', time:'14:08' },
+];
+
+async function animateQC(){
+  initQCCanvas();
+  await wait(400);
+
+  // Scan line
+  const scanLine=$('scan-line');
+  scanLine.classList.add('active');
+  await wait(2200);
+  scanLine.classList.remove('active');
+
+  // Results
+  const resBody=$('s3-results');
+  resBody.innerHTML='';
+  for(const r of qcResults){
+    const div=document.createElement('div');
+    div.className='s3-result-item';
+    div.innerHTML=`<span class="s3-result-label">${r.label}</span><span class="s3-result-val ${r.cls}">${r.val}</span>`;
+    resBody.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+  await wait(300);
+
+  // PASS stamp
+  $('ok-stamp').classList.add('show');
+  await wait(600);
+
+  // History
+  const histBody=$('s3-history');
+  histBody.innerHTML='';
+  for(const h of qcHistory){
+    const div=document.createElement('div');
+    div.className='s3-hist-row';
+    div.innerHTML=`<span class="hist-id">${h.id}</span><span class="hist-result ${h.cls}">${h.result}</span><span class="hist-time">${h.time}</span>`;
+    histBody.appendChild(div);
+    await wait(150);
+    div.classList.add('show');
+  }
+}
+
+// ═══ SCREEN 4: Process Digitization ═══
+const sopLines = [
+  '1. 来料检验：目视检查外观，手动记录批次号',
+  '2. 上料装夹：参考老师傅经验，调整夹具位置',
+  '3. CNC 加工：按工艺卡设定参数，注意主轴温度',
+  '4. 首件检测：用千分尺测量关键尺寸，口头汇报',
+  '5. 批量生产：每50件抽检一次，纸质记录',
+  '6. 成品入库：手写入库单，通知仓管',
+];
+
+const flowSteps = [
+  { text:'来料扫码 → 自动关联批次、供应商、质检标准', status:'已完成', cls:'done-step', fsCls:'fs-done' },
+  { text:'智能装夹 → 3D 模型自动匹配最优夹具方案', status:'已完成', cls:'done-step', fsCls:'fs-done' },
+  { text:'参数自动下发 → MES 直连机床，零手动输入', status:'执行中', cls:'active-step', fsCls:'fs-active' },
+  { text:'在线测量 → 三坐标自动检测，数据实时上传', status:'等待中', cls:'', fsCls:'fs-wait' },
+  { text:'SPC 实时监控 → 异常自动告警，追溯到工序', status:'等待中', cls:'', fsCls:'fs-wait' },
+  { text:'自动入库 → ERP 联动，无纸化交接', status:'等待中', cls:'', fsCls:'fs-wait' },
+];
+
+const s4Stats = [
+  { val:'100%', label:'流程可追溯性', change:'+100%', color:'#16A34A', changeColor:'#16A34A' },
+  { val:'0', label:'纸质表单', change:'-100%', color:'#2563EB', changeColor:'#16A34A' },
+  { val:'85%', label:'人工录入减少', change:'效率提升', color:'#F97316', changeColor:'#F97316' },
+];
+
+async function animateDigitization(){
+  // Paper SOP lines
+  const paperBody=$('sop-paper');
+  paperBody.innerHTML='';
+  for(let i=0;i<sopLines.length;i++){
+    const div=document.createElement('div');
+    div.className='sop-line';
+    div.textContent=sopLines[i];
+    paperBody.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+  await wait(400);
+
+  // Scanning animation
+  const arrow=$('s4-arrow');
+  arrow.querySelector('span').classList.add('s4-arrow-anim');
+  const lines=paperBody.querySelectorAll('.sop-line');
+  for(const line of lines){
+    line.classList.add('scanned');
+    await wait(250);
+  }
+  await wait(300);
+
+  // Digital flow steps
+  const digitalBody=$('sop-digital');
+  digitalBody.innerHTML='';
+  for(let i=0;i<flowSteps.length;i++){
+    const f=flowSteps[i];
+    const div=document.createElement('div');
+    div.className=`flow-step ${f.cls}`;
+    div.innerHTML=`<div class="flow-num">${i+1}</div><div class="flow-text">${f.text}</div><div class="flow-status ${f.fsCls}">${f.status}</div>`;
+    digitalBody.appendChild(div);
+    await wait(250);
+    div.classList.add('show');
+  }
+  await wait(400);
+
+  // Stats
+  const statsRow=$('s4-stats');
+  statsRow.innerHTML='';
+  for(let i=0;i<s4Stats.length;i++){
+    const s=s4Stats[i];
+    const div=document.createElement('div');
+    div.className='s4-stat';
+    div.innerHTML=`<div class="s4-stat-val" style="color:${s.color};">${s.val}</div><div class="s4-stat-label">${s.label}</div><div class="s4-stat-change" style="color:${s.changeColor};">${s.change}</div>`;
+    statsRow.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+}
+
+// ═══ MAIN ANIMATION LOOP ═══
+async function mainAnimation(){
+  // ── Screen 1: Dashboard ──
+  switchScreen('screen1');
+  document.querySelectorAll('.s1-nav-item').forEach(n=>n.classList.remove('active'));
+  $('nav-dash').classList.add('active');
+  await animateDashboard();
+  await wait(2500);
+
+  // ── Click on 排程中心 ──
+  moveCursor(85, 100);
+  await wait(500);
+  showClick(85, 100);
+  document.querySelectorAll('.s1-nav-item').forEach(n=>n.classList.remove('active'));
+  $('nav-sched').classList.add('active');
+  await wait(300);
+
+  // ── Screen 2: Scheduling ──
+  hideCursor();
+  switchScreen('screen2');
+  await wait(300);
+  await animateScheduling();
+  await wait(3000);
+
+  // ── Back to Screen 1, click 质检监控 ──
+  switchScreen('screen1');
+  await wait(300);
+  moveCursor(85, 155);
+  await wait(500);
+  showClick(85, 155);
+  document.querySelectorAll('.s1-nav-item').forEach(n=>n.classList.remove('active'));
+  $('nav-qc').classList.add('active');
+  await wait(300);
+
+  // ── Screen 3: QC ──
+  hideCursor();
+  $('ok-stamp').classList.remove('show');
+  switchScreen('screen3');
+  await wait(300);
+  await animateQC();
+  await wait(3000);
+
+  // ── Back to Screen 1, click 流程管理 ──
+  switchScreen('screen1');
+  await wait(300);
+  moveCursor(85, 210);
+  await wait(500);
+  showClick(85, 210);
+  document.querySelectorAll('.s1-nav-item').forEach(n=>n.classList.remove('active'));
+  $('nav-flow').classList.add('active');
+  await wait(300);
+
+  // ── Screen 4: Digitization ──
+  hideCursor();
+  switchScreen('screen4');
+  await wait(300);
+  await animateDigitization();
+  await wait(3500);
+
+  // ── Loop ──
+  hideCursor();
+  await wait(1000);
+  mainAnimation();
+}
+
+setTimeout(()=>mainAnimation(), 600);
+</script>
+</body>
+</html>
