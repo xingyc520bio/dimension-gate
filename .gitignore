@@ -4,3 +4,5 @@ submissions.db
 .vercel/
 *.bat
 server.py
+.wrangler/
+node_modules/

@@ -421,7 +421,7 @@
       <button class="tab-btn" onclick="switchTab('edu',this)">🎓 <span class="cn-only">教育 Agent</span><span class="en-only">Education Agent</span></button>
       <button class="tab-btn" onclick="switchTab('mfg',this)">🏭 <span class="cn-only">制造业优化</span><span class="en-only">Manufacturing</span></button>
       <button class="tab-btn" onclick="switchTab('ceo',this)">👔 <span class="cn-only">董事长助理 Agent</span><span class="en-only">Executive Assistant</span></button>
-      <button class="tab-btn" onclick="switchTab('bid',this)">📑 <span class="cn-only">一键写标书</span><span class="en-only">Bid Proposal Agent</span></button>
+      <button class="tab-btn" onclick="switchTab('bid',this)">📑 <span class="cn-only">AI招投标服务助手</span><span class="en-only">AI Bid Service Agent</span></button>
     </div>
 
     <div class="tab-pane tab-pane-full active" id="tab-cs">
@@ -451,8 +451,8 @@
           <div class="prod-icon">🎓</div>
           <div class="prod-title cn-only">维度之门智教联思 · EduMind Agent</div>
           <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">EduMind Education Agent</div>
-          <div class="prod-tagline cn-only">「每一个学生，都值得拥有全天候专属学习顾问。」</div>
-          <div class="prod-tagline en-only">"Every student deserves a 24/7 personalized learning advisor."</div>
+          <div class="prod-tagline cn-only">「为教师工作流AI助手，老师备课减负。」</div>
+          <div class="prod-tagline en-only">"AI workflow assistant for teachers — less prep, more teaching."</div>
         </div>
         <div class="prod-tags">
           <span class="tag">K12</span>
@@ -487,15 +487,14 @@
       </div>
     </div>
 
-    <div class="tab-pane" id="tab-ceo">
-      <div>
-        <div class="prod-icon">👔</div>
-        <div class="prod-title cn-only">董事长助理 Agent</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Executive Assistant Agent</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">高管时间极其稀缺，信息过载严重；PPT 汇报材料依赖人工、耗时长；行业动态追踪碎片化，错过关键信号。</p>
-          <p class="en-only">Executives are time-starved with information overload; presentation prep is manual and slow; industry trends tracking is fragmented.</p>
+    <div class="tab-pane tab-pane-full" id="tab-ceo">
+      <div class="prod-header-row">
+        <div>
+          <div class="prod-icon">👔</div>
+          <div class="prod-title cn-only">董事长助理 Agent</div>
+          <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Executive Assistant Agent</div>
+          <div class="prod-tagline cn-only">「让 AI 成为你最高效的幕僚长。」</div>
+          <div class="prod-tagline en-only">"Let AI be your most efficient chief of staff."</div>
         </div>
         <div class="prod-tags">
           <span class="tag cn-only">企业高管</span><span class="tag en-only">C-Suite</span>
@@ -503,25 +502,20 @@
           <span class="tag cn-only">投资机构</span><span class="tag en-only">Investment Firms</span>
           <span class="tag cn-only">集团总部</span><span class="tag en-only">Corporate HQ</span>
         </div>
-        <div class="prod-tagline cn-only">「让 AI 成为你最高效的幕僚长。」</div>
-        <div class="prod-tagline en-only">"Let AI be your most efficient chief of staff."</div>
       </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">📊</div><div><div class="feat-title cn-only">一键生成汇报 PPT</div><div class="feat-title en-only">One-Click Report PPT</div><div class="feat-desc cn-only">输入主题或数据，自动生成专业级公司产品介绍、经营汇报、融资路演 PPT</div><div class="feat-desc en-only">Input a topic or data, auto-generate professional presentations for products, operations, or fundraising</div></div></li>
-        <li><div class="feat-ic">📰</div><div><div class="feat-title cn-only">每日行业资讯推荐</div><div class="feat-title en-only">Daily Industry Briefing</div><div class="feat-desc cn-only">每日自动抓取、筛选、摘要行业最新政策、竞品动态、技术趋势，推送个性化早报</div><div class="feat-desc en-only">Auto-curated daily briefing: policies, competitor moves, tech trends — personalized to your industry</div></div></li>
-        <li><div class="feat-ic">🗂️</div><div><div class="feat-title cn-only">智能决策辅助</div><div class="feat-title en-only">Decision Intelligence</div><div class="feat-desc cn-only">整合内部数据与外部情报，快速生成分析报告与决策建议，辅助高管高效拍板</div><div class="feat-desc en-only">Combines internal data with market intelligence to generate actionable insights for faster decisions</div></div></li>
-      </ul>
+      <div class="demo-embed-full">
+        <iframe src="demo-ceo.html" class="demo-iframe-full" loading="lazy" title="董事长助理 Agent 实时演示"></iframe>
+      </div>
     </div>
 
-    <div class="tab-pane" id="tab-bid">
-      <div>
-        <div class="prod-icon">📑</div>
-        <div class="prod-title cn-only">一键写标书 Agent</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Bid Proposal Agent</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">投标是企业营收命脉，但写标书极度耗时：读懂招标文件要半天，拼凑资质材料要一天，排版校对再一天。中小企业养不起专职标书团队，大企业同时投多个标时人手严重不足。</p>
-          <p class="en-only">Bidding drives revenue, but proposal writing is brutal: half a day to digest requirements, a full day to compile qualifications, another for formatting. SMEs can't afford dedicated teams; large firms run short when bidding on multiple projects.</p>
+    <div class="tab-pane tab-pane-full" id="tab-bid">
+      <div class="prod-header-row">
+        <div>
+          <div class="prod-icon">📑</div>
+          <div class="prod-title cn-only">AI 招投标服务助手</div>
+          <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">AI Bid Service Agent</div>
+          <div class="prod-tagline cn-only">「别人还在翻招标文件，你的标书已经生成了。」</div>
+          <div class="prod-tagline en-only">"While others are still reading the RFP, your proposal is already done."</div>
         </div>
         <div class="prod-tags">
           <span class="tag cn-only">工程建设</span><span class="tag en-only">Construction</span>
@@ -529,14 +523,10 @@
           <span class="tag cn-only">政府采购</span><span class="tag en-only">Gov Procurement</span>
           <span class="tag cn-only">医疗器械</span><span class="tag en-only">Medical Devices</span>
         </div>
-        <div class="prod-tagline cn-only">「别人还在翻招标文件，你的标书已经生成了。」</div>
-        <div class="prod-tagline en-only">"While others are still reading the RFP, your proposal is already done."</div>
       </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">招标文件智能解析</div><div class="feat-title en-only">Smart RFP Parsing</div><div class="feat-desc cn-only">上传招标文件，AI 自动提取评分标准、资质要求、技术参数、交付节点等关键信息，生成结构化摘要</div><div class="feat-desc en-only">Upload RFP docs — AI auto-extracts scoring criteria, qualifications, tech specs, and deadlines into structured summaries</div></div></li>
-        <li><div class="feat-ic">✍️</div><div><div class="feat-title cn-only">一键生成投标方案</div><div class="feat-title en-only">One-Click Proposal Draft</div><div class="feat-desc cn-only">基于企业资质库 + 历史标书 + 招标要求，自动生成技术方案、商务方案、报价书，格式规范、逐条响应</div><div class="feat-desc en-only">Auto-generates technical, commercial, and pricing proposals based on your qualification library, past bids, and current requirements</div></div></li>
-        <li><div class="feat-ic">✅</div><div><div class="feat-title cn-only">合规性自检与优化</div><div class="feat-title en-only">Compliance Check & Optimization</div><div class="feat-desc cn-only">自动对比标书与招标要求，逐项检查是否漏项、偏离或违规，并给出修改建议与评分预估</div><div class="feat-desc en-only">Auto-compares your draft against RFP requirements, flags gaps, deviations, and compliance risks with fix suggestions</div></div></li>
-      </ul>
+      <div class="demo-embed-full">
+        <iframe src="demo-bid.html" class="demo-iframe-full" loading="lazy" title="AI 招投标服务助手 实时演示"></iframe>
+      </div>
     </div>
   </div>
 </section>
@@ -857,8 +847,8 @@
         <a href="#products" onclick="switchTab('mfg')" class="en-only">Manufacturing</a>
         <a href="#products" onclick="switchTab('ceo')" class="cn-only">董事长助理 Agent</a>
         <a href="#products" onclick="switchTab('ceo')" class="en-only">Executive Assistant</a>
-        <a href="#products" onclick="switchTab('bid')" class="cn-only">一键写标书</a>
-        <a href="#products" onclick="switchTab('bid')" class="en-only">Bid Proposal Agent</a>
+        <a href="#products" onclick="switchTab('bid')" class="cn-only">AI招投标服务助手</a>
+        <a href="#products" onclick="switchTab('bid')" class="en-only">AI Bid Service Agent</a>
       </div>
       <div class="footer-col">
         <h5 class="cn-only">联系我们</h5>

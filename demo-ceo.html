@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>维度之门 · 董事长助理 Agent 演示</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#F0EDE8; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'DM Sans','PingFang SC',sans-serif; overflow:hidden; }
+
+  .laptop { position:relative; width:900px; }
+  .laptop-screen { background:#fff; border-radius:12px; border:1px solid #D4CFC7; overflow:hidden; box-shadow: 0 25px 80px rgba(40,30,10,.10), 0 4px 20px rgba(0,0,0,.04); }
+  .laptop-base { width:60%; height:12px; margin:0 auto; background:linear-gradient(180deg,#CDC6BB,#D8D2C8); border-radius:0 0 8px 8px; }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:#1A1A2E; border-bottom:1px solid #2D2D44; }
+  .topbar-left { display:flex; align-items:center; gap:8px; }
+  .wdot { width:8px; height:8px; border-radius:50%; }
+  .wdot-r { background:#ff5f57; } .wdot-y { background:#ffbd2e; } .wdot-g { background:#28c840; }
+  .topbar-title { font-size:12px; color:#8B8BA0; margin-left:12px; font-family:'JetBrains Mono',monospace; }
+  .topbar-right { display:flex; gap:6px; align-items:center; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:#D4A843; animation:pulse-dot 2s infinite; }
+  .status-text { font-size:11px; color:#8B8BA0; font-family:'JetBrains Mono',monospace; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .app { height:480px; position:relative; overflow:hidden; }
+  .screen { position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  .screen.active { opacity:1; pointer-events:auto; }
+
+  /* ── BRAND ── */
+  .brand-logo { display:flex; align-items:center; gap:7px; }
+  .brand-icon { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#D4A843,#B8860B); display:flex; align-items:center; justify-content:center; }
+  .brand-icon svg { width:16px; height:16px; }
+  .brand-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:#1A1A2E; letter-spacing:-.02em; }
+  .brand-sub { font-size:9px; color:#8B8BA0; font-family:'JetBrains Mono',monospace; letter-spacing:.03em; }
+
+  /* ═══ SIDEBAR (shared) ═══ */
+  .s-sidebar { width:175px; background:#FAFAF7; border-right:1px solid #E8E4DD; display:flex; flex-direction:column; }
+  .s-sidebar-header { padding:14px 14px; border-bottom:1px solid #E8E4DD; }
+  .s-nav { padding:8px; flex:1; }
+  .s-nav-item { display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:10px; margin-bottom:4px; cursor:pointer; transition:all .25s; }
+  .s-nav-item.active { background:#FFF8E7; border:1px solid #E8D5A0; }
+  .s-nav-item:not(.active) { border:1px solid transparent; }
+  .s-nav-icon { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .s-nav-icon svg { width:14px; height:14px; }
+  .ic-ppt { background:rgba(212,168,67,.12); color:#B8860B; }
+  .ic-news { background:rgba(59,130,246,.12); color:#1D4ED8; }
+  .ic-decide { background:rgba(139,92,246,.12); color:#6D28D9; }
+  .ic-home { background:rgba(16,185,129,.12); color:#047857; }
+  .s-nav-text { font-size:12px; font-weight:600; color:#334155; }
+  .s-nav-desc { font-size:10px; color:#94A3B8; margin-top:2px; }
+
+  .s-time { padding:12px 14px; border-top:1px solid #E8E4DD; text-align:center; }
+  .s-time-val { font-size:18px; font-weight:800; font-family:'JetBrains Mono',monospace; color:#1A1A2E; }
+  .s-time-date { font-size:10px; color:#8B8BA0; margin-top:2px; font-family:'JetBrains Mono',monospace; }
+
+  /* ═══ SCREEN 1: DASHBOARD ═══ */
+  .s1-main { flex:1; display:flex; }
+  .s1-content { flex:1; display:flex; flex-direction:column; background:#FAFBFC; }
+  .s1-header { padding:14px 20px; border-bottom:1px solid #E8E4DD; }
+  .s1-greeting { font-size:16px; font-weight:700; color:#1A1A2E; }
+  .s1-greeting-sub { font-size:12px; color:#8B8BA0; margin-top:2px; }
+
+  .s1-body { flex:1; padding:16px 20px; display:flex; gap:14px; overflow:hidden; }
+  .s1-left { flex:1; display:flex; flex-direction:column; gap:12px; }
+  .s1-right { width:230px; display:flex; flex-direction:column; gap:12px; }
+
+  .card { background:#fff; border:1px solid #E8E4DD; border-radius:12px; overflow:hidden; }
+  .card-header { padding:10px 14px; border-bottom:1px solid #F1EDE6; display:flex; align-items:center; justify-content:space-between; }
+  .card-title { font-size:12px; font-weight:700; color:#334155; }
+  .card-badge { font-size:9px; padding:2px 8px; border-radius:10px; font-family:'JetBrains Mono',monospace; font-weight:600; }
+  .badge-gold { background:#FFF8E7; color:#B8860B; border:1px solid #E8D5A0; }
+  .badge-blue { background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; }
+  .badge-purple { background:#F3E8FF; color:#7C3AED; border:1px solid #DDD6FE; }
+  .card-body { padding:12px 14px; }
+
+  .agenda-item { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #F8F6F2; opacity:0; transform:translateX(-10px); transition:all .35s ease; }
+  .agenda-item.show { opacity:1; transform:translateX(0); }
+  .agenda-time { font-size:10px; color:#8B8BA0; font-family:'JetBrains Mono',monospace; width:42px; flex-shrink:0; }
+  .agenda-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .agenda-text { font-size:11px; color:#334155; flex:1; }
+  .agenda-tag { font-size:8px; padding:1px 6px; border-radius:4px; font-weight:600; }
+
+  .quick-btn { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; margin-bottom:6px; border:1px solid #E8E4DD; cursor:pointer; transition:all .3s; opacity:0; transform:translateY(6px); transition:all .35s ease; }
+  .quick-btn.show { opacity:1; transform:translateY(0); }
+  .quick-btn:hover { border-color:#D4A843; background:#FFF8E7; }
+  .quick-icon { font-size:16px; }
+  .quick-text { font-size:11px; font-weight:600; color:#334155; }
+  .quick-desc { font-size:9px; color:#8B8BA0; }
+  .quick-arrow { margin-left:auto; font-size:12px; color:#CBD5E1; }
+
+  .kpi-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi-mini { text-align:center; padding:10px 6px; background:#FAFAF7; border-radius:8px; border:1px solid #E8E4DD; opacity:0; transform:scale(.9); transition:all .35s ease; }
+  .kpi-mini.show { opacity:1; transform:scale(1); }
+  .kpi-mini-val { font-size:18px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+  .kpi-mini-label { font-size:9px; color:#8B8BA0; margin-top:2px; }
+
+  /* ═══ SCREEN 2: PPT GENERATION ═══ */
+  .s2-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#FFF8E7; border-bottom:1px solid #E8D5A0; }
+  .s2-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E8E4DD; font-size:11px; color:#64748B; cursor:pointer; }
+  .s2-title { font-size:13px; font-weight:700; color:#92610B; flex:1; }
+  .s2-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#FFF8E7; color:#B8860B; border:1px solid #E8D5A0; font-family:'JetBrains Mono',monospace; }
+
+  .s2-content { flex:1; display:flex; padding:16px 20px; gap:16px; background:#FAFBFC; }
+  .s2-left { width:260px; display:flex; flex-direction:column; gap:12px; }
+  .s2-input-card { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:14px; }
+  .s2-input-card h5 { font-size:10px; color:#8B8BA0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .s2-input-field { width:100%; padding:10px 12px; border:1px solid #E8E4DD; border-radius:8px; font-size:11px; color:#334155; background:#FAFAF7; min-height:36px; font-family:'DM Sans','PingFang SC',sans-serif; transition:all .3s; }
+  .s2-input-field.focused { border-color:#D4A843; box-shadow:0 0 0 3px rgba(212,168,67,.12); }
+  .s2-input-field.has-text { color:#1A1A2E; background:#fff; }
+  .s2-input-label { font-size:10px; color:#8B8BA0; margin:8px 0 4px; }
+  .s2-gen-btn { width:100%; padding:10px; border-radius:10px; background:linear-gradient(135deg,#D4A843,#B8860B); color:#fff; font-size:12px; font-weight:700; text-align:center; margin-top:10px; cursor:pointer; transition:all .3s; opacity:.5; }
+  .s2-gen-btn.active { opacity:1; animation:btn-glow 1.5s ease-in-out infinite; }
+  @keyframes btn-glow { 0%,100%{box-shadow:0 0 0 0 rgba(212,168,67,.3);} 50%{box-shadow:0 0 0 8px rgba(212,168,67,0);} }
+
+  .s2-log { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:14px; flex:1; overflow:hidden; }
+  .s2-log h5 { font-size:10px; color:#8B8BA0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .log-item { font-size:10px; font-family:'JetBrains Mono',monospace; line-height:1.7; padding:3px 0; border-bottom:1px solid #F8F6F2; opacity:0; transform:translateY(4px); transition:all .3s ease; }
+  .log-item.show { opacity:1; transform:translateY(0); }
+  .log-time { color:#CBD5E1; margin-right:6px; }
+  .log-ok { color:#16A34A; } .log-ai { color:#D4A843; }
+
+  .s2-preview { flex:1; background:#fff; border:1px solid #E8E4DD; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s2-preview-header { padding:10px 14px; border-bottom:1px solid #F1EDE6; display:flex; align-items:center; justify-content:space-between; }
+  .s2-preview-title { font-size:12px; font-weight:700; color:#334155; }
+  .s2-slides-wrap { flex:1; padding:12px; display:flex; flex-direction:column; gap:10px; overflow:hidden; }
+  .slide-card { background:#FAFAF7; border:1px solid #E8E4DD; border-radius:8px; padding:10px 12px; opacity:0; transform:translateY(10px); transition:all .4s ease; display:flex; gap:10px; }
+  .slide-card.show { opacity:1; transform:translateY(0); }
+  .slide-num { width:26px; height:26px; border-radius:6px; background:linear-gradient(135deg,#D4A843,#B8860B); color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+  .slide-content { flex:1; }
+  .slide-title { font-size:11px; font-weight:700; color:#1A1A2E; margin-bottom:2px; }
+  .slide-desc { font-size:9px; color:#8B8BA0; line-height:1.5; }
+  .slide-elements { display:flex; gap:4px; margin-top:4px; }
+  .slide-el { font-size:8px; padding:1px 5px; border-radius:3px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; }
+
+  /* ═══ SCREEN 3: NEWS BRIEFING ═══ */
+  .s3-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#EFF6FF; border-bottom:1px solid #BFDBFE; }
+  .s3-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E2E8F0; font-size:11px; color:#64748B; cursor:pointer; }
+  .s3-title { font-size:13px; font-weight:700; color:#1E40AF; flex:1; }
+  .s3-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; font-family:'JetBrains Mono',monospace; }
+
+  .s3-content { flex:1; display:flex; padding:16px 20px; gap:16px; background:#FAFBFC; }
+  .s3-feed { flex:1; display:flex; flex-direction:column; gap:10px; overflow:hidden; }
+  .news-card { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:14px; opacity:0; transform:translateY(10px); transition:all .4s ease; display:flex; gap:12px; }
+  .news-card.show { opacity:1; transform:translateY(0); }
+  .news-cat-dot { width:4px; border-radius:2px; flex-shrink:0; }
+  .news-body { flex:1; }
+  .news-cat { font-size:9px; font-weight:600; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+  .news-headline { font-size:12px; font-weight:700; color:#1A1A2E; margin-bottom:4px; line-height:1.4; }
+  .news-summary { font-size:10px; color:#64748B; line-height:1.6; }
+  .news-meta { display:flex; gap:8px; margin-top:6px; font-size:9px; font-family:'JetBrains Mono',monospace; color:#94A3B8; }
+  .news-source { padding:1px 6px; border-radius:3px; background:#F1F5F9; }
+  .news-ai-tag { padding:1px 6px; border-radius:3px; background:#FFF8E7; color:#B8860B; border:1px solid #E8D5A0; }
+
+  .s3-right { width:200px; display:flex; flex-direction:column; gap:12px; }
+  .s3-summary-card { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:14px; }
+  .s3-summary-card h5 { font-size:10px; color:#8B8BA0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .summary-stat { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #F8F6F2; font-size:11px; opacity:0; transition:all .3s ease; }
+  .summary-stat.show { opacity:1; }
+  .summary-label { color:#64748B; }
+  .summary-val { font-weight:700; font-family:'JetBrains Mono',monospace; }
+
+  .s3-topics { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:14px; flex:1; overflow:hidden; }
+  .s3-topics h5 { font-size:10px; color:#8B8BA0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .topic-item { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #F8F6F2; opacity:0; transition:all .3s ease; }
+  .topic-item.show { opacity:1; }
+  .topic-rank { font-size:10px; font-weight:800; color:#D4A843; font-family:'JetBrains Mono',monospace; width:18px; }
+  .topic-name { font-size:10px; color:#334155; flex:1; }
+  .topic-heat { font-size:9px; color:#EF4444; font-family:'JetBrains Mono',monospace; }
+
+  /* ═══ SCREEN 4: DECISION INTELLIGENCE ═══ */
+  .s4-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#F3E8FF; border-bottom:1px solid #DDD6FE; }
+  .s4-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #E2E8F0; font-size:11px; color:#64748B; cursor:pointer; }
+  .s4-title { font-size:13px; font-weight:700; color:#6D28D9; flex:1; }
+  .s4-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#F3E8FF; color:#7C3AED; border:1px solid #DDD6FE; font-family:'JetBrains Mono',monospace; }
+
+  .s4-content { flex:1; display:flex; flex-direction:column; padding:16px 20px; gap:14px; background:#FAFBFC; }
+  .s4-top { display:flex; gap:14px; }
+  .s4-chart { flex:1; background:#fff; border:1px solid #E8E4DD; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .s4-chart-header { padding:10px 14px; border-bottom:1px solid #F1EDE6; display:flex; align-items:center; justify-content:space-between; }
+  .s4-chart-title { font-size:12px; font-weight:700; color:#334155; }
+  .s4-chart-body { flex:1; position:relative; padding:10px; }
+  .s4-chart-body canvas { width:100%; height:100%; }
+
+  .s4-metrics { width:200px; display:flex; flex-direction:column; gap:10px; }
+  .s4-metric { background:#fff; border:1px solid #E8E4DD; border-radius:12px; padding:12px; text-align:center; opacity:0; transform:translateY(8px); transition:all .4s ease; }
+  .s4-metric.show { opacity:1; transform:translateY(0); }
+  .s4-metric-val { font-size:22px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+  .s4-metric-label { font-size:9px; color:#8B8BA0; margin-top:2px; }
+  .s4-metric-change { font-size:9px; font-weight:600; margin-top:4px; font-family:'JetBrains Mono',monospace; }
+  .change-up { color:#16A34A; } .change-down { color:#DC2626; }
+
+  .s4-bottom { background:#fff; border:1px solid #E8E4DD; border-radius:12px; overflow:hidden; }
+  .s4-ai-header { padding:10px 14px; border-bottom:1px solid #F1EDE6; display:flex; align-items:center; gap:8px; }
+  .s4-ai-icon { width:20px; height:20px; border-radius:6px; background:linear-gradient(135deg,#D4A843,#B8860B); display:flex; align-items:center; justify-content:center; font-size:10px; }
+  .s4-ai-title { font-size:12px; font-weight:700; color:#334155; }
+  .s4-ai-body { padding:12px 14px; }
+  .ai-rec { display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid #F8F6F2; opacity:0; transform:translateX(-8px); transition:all .4s ease; }
+  .ai-rec.show { opacity:1; transform:translateX(0); }
+  .ai-rec-icon { font-size:14px; flex-shrink:0; margin-top:2px; }
+  .ai-rec-text { flex:1; }
+  .ai-rec-title { font-size:11px; font-weight:700; color:#1A1A2E; }
+  .ai-rec-desc { font-size:10px; color:#64748B; margin-top:2px; line-height:1.5; }
+  .ai-rec-confidence { font-size:9px; font-weight:600; padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+  .conf-high { background:#DCFCE7; color:#16A34A; }
+  .conf-mid { background:#FEF3C7; color:#D97706; }
+
+  .typing-cursor { display:inline-block; width:2px; height:12px; background:#D4A843; margin-left:2px; animation:blink-cursor .6s infinite; vertical-align:text-bottom; }
+  @keyframes blink-cursor { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+  .click-ripple { position:absolute; width:24px; height:24px; border-radius:50%; background:rgba(212,168,67,.3); border:2px solid rgba(212,168,67,.6); pointer-events:none; z-index:999; animation:ripple .6s ease-out forwards; }
+  @keyframes ripple { 0%{transform:scale(0);opacity:1;} 100%{transform:scale(2.5);opacity:0;} }
+
+  .cursor-pointer { position:absolute; z-index:1000; pointer-events:none; width:20px; height:20px; transition:left .6s cubic-bezier(.4,0,.2,1), top .6s cubic-bezier(.4,0,.2,1); opacity:0; }
+  .cursor-pointer.show { opacity:1; }
+  .cursor-pointer svg { width:20px; height:20px; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.2)); }
+</style>
+</head>
+<body>
+
+<div class="laptop">
+  <div class="laptop-screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="wdot wdot-r"></div><div class="wdot wdot-y"></div><div class="wdot wdot-g"></div>
+        <span class="topbar-title">维度之门 · 董事长助理 Agent</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-dot"></div>
+        <span class="status-text">AI 幕僚在线</span>
+      </div>
+    </div>
+    <div class="app" id="app">
+
+      <!-- ═══ SCREEN 1: DASHBOARD ═══ -->
+      <div class="screen active" id="screen1">
+        <div class="s1-main">
+          <div class="s-sidebar">
+            <div class="s-sidebar-header">
+              <div class="brand-logo">
+                <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <div>
+                  <div class="brand-name">CEO Agent</div>
+                  <div class="brand-sub">董事长助理</div>
+                </div>
+              </div>
+            </div>
+            <div class="s-nav">
+              <div class="s-nav-item active" id="nav-home">
+                <div class="s-nav-icon ic-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+                <div><div class="s-nav-text">工作台</div><div class="s-nav-desc">今日总览</div></div>
+              </div>
+              <div class="s-nav-item" id="nav-ppt">
+                <div class="s-nav-icon ic-ppt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+                <div><div class="s-nav-text">一键 PPT</div><div class="s-nav-desc">汇报材料生成</div></div>
+              </div>
+              <div class="s-nav-item" id="nav-news">
+                <div class="s-nav-icon ic-news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/></svg></div>
+                <div><div class="s-nav-text">行业早报</div><div class="s-nav-desc">每日资讯推送</div></div>
+              </div>
+              <div class="s-nav-item" id="nav-decide">
+                <div class="s-nav-icon ic-decide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <div><div class="s-nav-text">决策辅助</div><div class="s-nav-desc">数据驱动决策</div></div>
+              </div>
+            </div>
+            <div class="s-time">
+              <div class="s-time-val" id="clock">14:32</div>
+              <div class="s-time-date">2026-03-06 周五</div>
+            </div>
+          </div>
+          <div class="s1-content">
+            <div class="s1-header">
+              <div class="s1-greeting">早上好，行总 👋</div>
+              <div class="s1-greeting-sub">今天有 3 项待办、2 条重要行业动态需要您关注</div>
+            </div>
+            <div class="s1-body">
+              <div class="s1-left">
+                <div class="card" style="flex:1;">
+                  <div class="card-header">
+                    <div class="card-title">今日日程</div>
+                    <div class="card-badge badge-gold">4 项</div>
+                  </div>
+                  <div class="card-body" id="agenda-body"></div>
+                </div>
+                <div class="kpi-row" id="kpi-row"></div>
+              </div>
+              <div class="s1-right">
+                <div class="card-title" style="font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">快捷操作</div>
+                <div id="quick-actions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 2: PPT GENERATION ═══ -->
+      <div class="screen" id="screen2">
+        <div class="s2-toolbar">
+          <div class="s2-back">&larr; 返回</div>
+          <div class="s2-title">一键生成汇报 PPT · AI 幻灯片引擎</div>
+          <div class="s2-badge">PPT AGENT</div>
+        </div>
+        <div class="s2-content">
+          <div class="s2-left">
+            <div class="s2-input-card">
+              <h5>汇报主题</h5>
+              <div class="s2-input-field" id="ppt-topic"></div>
+              <div class="s2-input-label">汇报类型</div>
+              <div class="s2-input-field" id="ppt-type" style="font-size:11px;color:#94A3B8;">经营汇报</div>
+              <div class="s2-input-label">页数 & 风格</div>
+              <div class="s2-input-field" id="ppt-style" style="font-size:11px;color:#94A3B8;">12 页 · 商务简约</div>
+              <div class="s2-gen-btn" id="ppt-gen-btn">AI 一键生成 PPT →</div>
+            </div>
+            <div class="s2-log">
+              <h5>AI 生成日志</h5>
+              <div id="ppt-log-body"></div>
+            </div>
+          </div>
+          <div class="s2-preview">
+            <div class="s2-preview-header">
+              <div class="s2-preview-title">幻灯片预览</div>
+              <div class="card-badge badge-gold">AI 生成</div>
+            </div>
+            <div class="s2-slides-wrap" id="slides-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 3: NEWS BRIEFING ═══ -->
+      <div class="screen" id="screen3">
+        <div class="s3-toolbar">
+          <div class="s3-back">&larr; 返回</div>
+          <div class="s3-title">每日行业资讯 · AI 智能早报</div>
+          <div class="s3-badge">DAILY BRIEF</div>
+        </div>
+        <div class="s3-content">
+          <div class="s3-feed" id="news-feed"></div>
+          <div class="s3-right">
+            <div class="s3-summary-card">
+              <h5>今日概览</h5>
+              <div id="news-summary"></div>
+            </div>
+            <div class="s3-topics">
+              <h5>热门关键词</h5>
+              <div id="hot-topics"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 4: DECISION INTELLIGENCE ═══ -->
+      <div class="screen" id="screen4">
+        <div class="s4-toolbar">
+          <div class="s4-back">&larr; 返回</div>
+          <div class="s4-title">智能决策辅助 · 数据驱动分析</div>
+          <div class="s4-badge">DECISION AI</div>
+        </div>
+        <div class="s4-content">
+          <div class="s4-top">
+            <div class="s4-chart">
+              <div class="s4-chart-header">
+                <div class="s4-chart-title">营收与利润趋势 (近 12 月)</div>
+                <div class="card-badge badge-purple">实时数据</div>
+              </div>
+              <div class="s4-chart-body"><canvas id="decisionCanvas"></canvas></div>
+            </div>
+            <div class="s4-metrics" id="s4-metrics"></div>
+          </div>
+          <div class="s4-bottom">
+            <div class="s4-ai-header">
+              <div class="s4-ai-icon">🧠</div>
+              <div class="s4-ai-title">AI 决策建议</div>
+              <div class="card-badge badge-purple" style="margin-left:auto;">3 条建议</div>
+            </div>
+            <div class="s4-ai-body" id="ai-recs"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cursor-pointer" id="cursor">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 3l14 8-6.5 2L8 19.5V3z" fill="#1A1A2E" stroke="#fff" stroke-width="1"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="laptop-base"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function showClick(x,y){
+  const r=document.createElement('div');
+  r.className='click-ripple';
+  r.style.left=(x-12)+'px'; r.style.top=(y-12)+'px';
+  $('app').appendChild(r);
+  setTimeout(()=>r.remove(),600);
+}
+function moveCursor(x,y){ const c=$('cursor'); c.classList.add('show'); c.style.left=x+'px'; c.style.top=y+'px'; }
+function hideCursor(){ $('cursor').classList.remove('show'); }
+function switchScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
+function setActiveNav(id){ document.querySelectorAll('.s-nav-item').forEach(n=>n.classList.remove('active')); $(id).classList.add('active'); }
+
+function typeInto(el, text, speed=45){
+  return new Promise(resolve=>{
+    el.innerHTML='';
+    el.classList.add('focused','has-text');
+    let i=0;
+    const cursor=document.createElement('span');
+    cursor.className='typing-cursor';
+    el.appendChild(cursor);
+    const iv=setInterval(()=>{
+      if(i<text.length){ el.insertBefore(document.createTextNode(text[i]),cursor); i++; }
+      else { clearInterval(iv); cursor.remove(); resolve(); }
+    },speed);
+  });
+}
+
+// ═══ SCREEN 1: Dashboard ═══
+const agendaData = [
+  { time:'09:00', color:'#D4A843', text:'董事会季度汇报', tag:'重要', tagBg:'#FEE2E2', tagColor:'#DC2626' },
+  { time:'10:30', color:'#2563EB', text:'新能源事业部战略评审', tag:'会议', tagBg:'#EFF6FF', tagColor:'#2563EB' },
+  { time:'14:00', color:'#7C3AED', text:'投资机构来访接待', tag:'外部', tagBg:'#F3E8FF', tagColor:'#7C3AED' },
+  { time:'16:00', color:'#16A34A', text:'Q1 业绩数据复盘', tag:'分析', tagBg:'#DCFCE7', tagColor:'#16A34A' },
+];
+
+const quickActions = [
+  { icon:'📊', text:'生成季度汇报 PPT', desc:'AI 一键生成 12 页专业级 PPT' },
+  { icon:'📰', text:'查看今日行业早报', desc:'5 条精选资讯等待阅读' },
+  { icon:'🧠', text:'决策辅助分析', desc:'3 条 AI 建议待确认' },
+];
+
+const kpiData = [
+  { val:'2.8亿', label:'Q1 营收', color:'#D4A843' },
+  { val:'+18%', label:'同比增长', color:'#16A34A' },
+  { val:'23.5%', label:'净利润率', color:'#2563EB' },
+  { val:'96分', label:'客户满意度', color:'#7C3AED' },
+];
+
+async function animateDashboard(){
+  // Agenda
+  const ab=$('agenda-body');
+  ab.innerHTML='';
+  for(const a of agendaData){
+    const div=document.createElement('div');
+    div.className='agenda-item';
+    div.innerHTML=`<span class="agenda-time">${a.time}</span><span class="agenda-dot" style="background:${a.color}"></span><span class="agenda-text">${a.text}</span><span class="agenda-tag" style="background:${a.tagBg};color:${a.tagColor};">${a.tag}</span>`;
+    ab.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+
+  // KPIs
+  const kr=$('kpi-row');
+  kr.innerHTML='';
+  for(const k of kpiData){
+    const div=document.createElement('div');
+    div.className='kpi-mini';
+    div.innerHTML=`<div class="kpi-mini-val" style="color:${k.color};">${k.val}</div><div class="kpi-mini-label">${k.label}</div>`;
+    kr.appendChild(div);
+    await wait(150);
+    div.classList.add('show');
+  }
+
+  // Quick actions
+  const qa=$('quick-actions');
+  qa.innerHTML='';
+  for(const q of quickActions){
+    const div=document.createElement('div');
+    div.className='quick-btn';
+    div.innerHTML=`<span class="quick-icon">${q.icon}</span><div><div class="quick-text">${q.text}</div><div class="quick-desc">${q.desc}</div></div><span class="quick-arrow">→</span>`;
+    qa.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+}
+
+// ═══ SCREEN 2: PPT Generation ═══
+const pptSlides = [
+  { num:'01', title:'封面 — Q1 经营汇报', desc:'公司名称 · 日期 · 汇报人', els:['标题','副标题','LOGO'] },
+  { num:'02', title:'Q1 核心指标总览', desc:'营收、利润、增长率一页呈现', els:['KPI 卡片','环比数据','趋势箭头'] },
+  { num:'03', title:'营收结构分析', desc:'按事业部/产品线拆解营收', els:['饼图','表格','同比'] },
+  { num:'04', title:'利润趋势 & 成本分析', desc:'月度利润率走势与成本结构', els:['折线图','成本饼图'] },
+  { num:'05', title:'核心业务亮点', desc:'新签客户、标杆项目、市场突破', els:['案例卡片','数据'] },
+  { num:'06', title:'Q2 战略规划 & 目标', desc:'下季度重点方向与量化目标', els:['目标表格','时间线'] },
+];
+
+const pptLogs = [
+  { time:'14:32:01', text:'接收主题：Q1 经营数据汇报', cls:'log-ai' },
+  { time:'14:32:02', text:'正在连接内部数据系统...', cls:'' },
+  { time:'14:32:04', text:'已读取 Q1 财务数据、CRM 数据', cls:'log-ok' },
+  { time:'14:32:06', text:'生成大纲：12 页，含封面和总结', cls:'log-ai' },
+  { time:'14:32:09', text:'自动配图与排版中...', cls:'log-ai' },
+  { time:'14:32:12', text:'PPT 生成完毕，可预览下载', cls:'log-ok' },
+];
+
+async function animatePPT(){
+  // Type topic
+  const topicField=$('ppt-topic');
+  topicField.innerHTML='<span style="color:#94A3B8;">输入汇报主题...</span>';
+  await wait(400);
+  await typeInto(topicField, 'Q1 经营数据汇报', 50);
+  await wait(300);
+
+  // Activate type and style
+  $('ppt-type').textContent='经营汇报';
+  $('ppt-type').style.color='#1A1A2E';
+  $('ppt-style').textContent='12 页 · 商务简约';
+  $('ppt-style').style.color='#1A1A2E';
+  await wait(200);
+
+  // Click generate
+  const btn=$('ppt-gen-btn');
+  btn.classList.add('active');
+  await wait(500);
+
+  // Logs
+  const logBody=$('ppt-log-body');
+  logBody.innerHTML='';
+  for(const l of pptLogs){
+    const div=document.createElement('div');
+    div.className='log-item';
+    div.innerHTML=`<span class="log-time">${l.time}</span><span class="${l.cls}">${l.text}</span>`;
+    logBody.appendChild(div);
+    await wait(350);
+    div.classList.add('show');
+  }
+
+  // Slides preview
+  const sw=$('slides-wrap');
+  sw.innerHTML='';
+  for(const s of pptSlides){
+    const div=document.createElement('div');
+    div.className='slide-card';
+    let elsHTML=s.els.map(e=>`<span class="slide-el">${e}</span>`).join('');
+    div.innerHTML=`<div class="slide-num">${s.num}</div><div class="slide-content"><div class="slide-title">${s.title}</div><div class="slide-desc">${s.desc}</div><div class="slide-elements">${elsHTML}</div></div>`;
+    sw.appendChild(div);
+    await wait(250);
+    div.classList.add('show');
+  }
+  btn.classList.remove('active');
+}
+
+// ═══ SCREEN 3: News Briefing ═══
+const newsData = [
+  { cat:'政策动态', catColor:'#DC2626', headline:'工信部发布《智能制造发展规划 2026》，明确 AI 产业化路径', summary:'重点支持工业大模型、智能排产、数字孪生三大方向。对 AI Agent 企业释放积极信号，建议密切关注配套补贴政策。', source:'工信部', time:'08:15' },
+  { cat:'竞品情报', catColor:'#D97706', headline:'XX 科技完成 B 轮 2 亿融资，加速制造业 AI 布局', summary:'竞品融资节奏加快，产品线与我司重合度约 40%。AI 建议加快差异化定位，重点强化教育 + 客服双赛道护城河。', source:'36氪', time:'09:30' },
+  { cat:'技术趋势', catColor:'#2563EB', headline:'Claude 4.5 发布：Agent 编排能力大幅提升', summary:'新模型在多步骤推理、工具调用准确率提升 35%，直接利好我司 Agent 产品底层能力。建议安排技术团队评估升级。', source:'Anthropic', time:'10:00' },
+  { cat:'市场信号', catColor:'#16A34A', headline:'教育部推进「AI + 教育」试点，300 所学校入围', summary:'政策风口明确，我司 EduMind Agent 契合度高。建议本周启动 To G 渠道拓展，争取首批试点合作。', source:'教育部', time:'11:20' },
+];
+
+const summaryData = [
+  { label:'今日资讯', val:'47 条', color:'#2563EB' },
+  { label:'AI 精选', val:'12 条', color:'#D4A843' },
+  { label:'需关注', val:'4 条', color:'#DC2626' },
+  { label:'已推送', val:'全部', color:'#16A34A' },
+];
+
+const hotTopics = [
+  { rank:'01', name:'智能制造 2026', heat:'+285%' },
+  { rank:'02', name:'AI Agent 融资潮', heat:'+192%' },
+  { rank:'03', name:'教育 AI 政策', heat:'+156%' },
+  { rank:'04', name:'大模型工具调用', heat:'+134%' },
+  { rank:'05', name:'跨境电商 AI', heat:'+98%' },
+];
+
+async function animateNews(){
+  // Feed
+  const feed=$('news-feed');
+  feed.innerHTML='';
+  for(const n of newsData){
+    const div=document.createElement('div');
+    div.className='news-card';
+    div.innerHTML=`
+      <div class="news-cat-dot" style="background:${n.catColor};"></div>
+      <div class="news-body">
+        <div class="news-cat" style="color:${n.catColor};">${n.cat}</div>
+        <div class="news-headline">${n.headline}</div>
+        <div class="news-summary">${n.summary}</div>
+        <div class="news-meta"><span class="news-source">${n.source}</span><span>${n.time}</span><span class="news-ai-tag">AI 摘要</span></div>
+      </div>`;
+    feed.appendChild(div);
+    await wait(350);
+    div.classList.add('show');
+  }
+
+  // Summary
+  const sb=$('news-summary');
+  sb.innerHTML='';
+  for(const s of summaryData){
+    const div=document.createElement('div');
+    div.className='summary-stat';
+    div.innerHTML=`<span class="summary-label">${s.label}</span><span class="summary-val" style="color:${s.color};">${s.val}</span>`;
+    sb.appendChild(div);
+    await wait(150);
+    div.classList.add('show');
+  }
+
+  // Hot topics
+  const ht=$('hot-topics');
+  ht.innerHTML='';
+  for(const t of hotTopics){
+    const div=document.createElement('div');
+    div.className='topic-item';
+    div.innerHTML=`<span class="topic-rank">${t.rank}</span><span class="topic-name">${t.name}</span><span class="topic-heat">${t.heat}</span>`;
+    ht.appendChild(div);
+    await wait(200);
+    div.classList.add('show');
+  }
+}
+
+// ═══ SCREEN 4: Decision Intelligence ═══
+function initDecisionCanvas(){
+  const canvas=$('decisionCanvas');
+  const wrap=canvas.parentElement;
+  canvas.width=wrap.clientWidth||460;
+  canvas.height=wrap.clientHeight||160;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const pad={top:20,right:20,bottom:30,left:45};
+  const cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
+
+  const months=['4月','5月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'];
+  const revenue=[1.8,2.0,2.1,2.3,2.2,2.5,2.4,2.6,2.8,2.7,2.9,3.1];
+  const profit=[0.38,0.42,0.45,0.50,0.46,0.55,0.52,0.58,0.63,0.60,0.66,0.72];
+
+  // Grid
+  ctx.strokeStyle='#F1EDE6';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(W-pad.right,y);ctx.stroke();
+    ctx.fillStyle='#94A3B8';ctx.font='9px JetBrains Mono';ctx.textAlign='right';
+    ctx.fillText((i*1).toFixed(0)+'亿',pad.left-5,y+3);
+  }
+
+  // X labels
+  ctx.textAlign='center';
+  months.forEach((m,i)=>{
+    const x=pad.left+cw*(i/(months.length-1));
+    ctx.fillStyle='#94A3B8';ctx.font='9px JetBrains Mono';
+    ctx.fillText(m,x,H-8);
+  });
+
+  // Animate lines
+  let progress=0;
+  function draw(){
+    // Clear chart area only
+    ctx.clearRect(pad.left-1,pad.top-1,cw+2,ch+2);
+    // Redraw grid
+    ctx.strokeStyle='#F1EDE6';ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){
+      const y=pad.top+ch*(1-i/4);
+      ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(W-pad.right,y);ctx.stroke();
+    }
+
+    const n=Math.floor(progress*11);
+    const frac=progress*11-n;
+
+    // Revenue line
+    ctx.beginPath();ctx.strokeStyle='#D4A843';ctx.lineWidth=2.5;
+    for(let i=0;i<=n&&i<12;i++){
+      const x=pad.left+cw*(i/11);
+      const y=pad.top+ch*(1-revenue[i]/4);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    if(n<11){
+      const nx=pad.left+cw*((n+frac)/11);
+      const ny=pad.top+ch*(1-(revenue[n]+(revenue[Math.min(n+1,11)]-revenue[n])*frac)/4);
+      ctx.lineTo(nx,ny);
+    }
+    ctx.stroke();
+
+    // Profit line
+    ctx.beginPath();ctx.strokeStyle='#7C3AED';ctx.lineWidth=2.5;ctx.setLineDash([5,3]);
+    for(let i=0;i<=n&&i<12;i++){
+      const x=pad.left+cw*(i/11);
+      const y=pad.top+ch*(1-profit[i]/1);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    if(n<11){
+      const nx=pad.left+cw*((n+frac)/11);
+      const ny=pad.top+ch*(1-(profit[n]+(profit[Math.min(n+1,11)]-profit[n])*frac)/1);
+      ctx.lineTo(nx,ny);
+    }
+    ctx.stroke();ctx.setLineDash([]);
+
+    // Dots
+    for(let i=0;i<=Math.min(n,11);i++){
+      const x=pad.left+cw*(i/11);
+      ctx.beginPath();ctx.arc(x,pad.top+ch*(1-revenue[i]/4),3,0,Math.PI*2);ctx.fillStyle='#D4A843';ctx.fill();
+      ctx.beginPath();ctx.arc(x,pad.top+ch*(1-profit[i]/1),3,0,Math.PI*2);ctx.fillStyle='#7C3AED';ctx.fill();
+    }
+
+    // Legend
+    ctx.fillStyle='#D4A843';ctx.font='bold 9px DM Sans';ctx.textAlign='left';
+    ctx.fillRect(pad.left,pad.top-12,12,2);ctx.fillText('营收',pad.left+16,pad.top-8);
+    ctx.fillStyle='#7C3AED';
+    ctx.fillRect(pad.left+60,pad.top-12,12,2);ctx.fillText('利润',pad.left+76,pad.top-8);
+
+    if(progress<1){ progress+=.025; requestAnimationFrame(draw); }
+  }
+  draw();
+}
+
+const decisionMetrics = [
+  { val:'3.1亿', label:'本月营收', change:'+12.3%', cls:'change-up', color:'#D4A843' },
+  { val:'23.5%', label:'净利润率', change:'+2.1%', cls:'change-up', color:'#7C3AED' },
+  { val:'89%', label:'目标达成率', change:'+5%', cls:'change-up', color:'#2563EB' },
+];
+
+const aiRecommendations = [
+  { icon:'🚀', title:'加速教育赛道投入', desc:'教育部 AI+教育试点政策窗口打开，建议本周启动 To G 渠道拓展，预计可获取 5-8 所试点学校。', conf:'92%', confCls:'conf-high' },
+  { icon:'⚠️', title:'关注竞品融资动态', desc:'XX科技 B 轮融资 2 亿，产品线重合度 40%。建议加快差异化壁垒建设，强化跨境客服 + 教育双线优势。', conf:'87%', confCls:'conf-high' },
+  { icon:'💡', title:'技术架构升级建议', desc:'Claude 4.5 Agent 能力大幅提升，建议安排技术团队评估底层模型升级，预计效能提升 30%+。', conf:'78%', confCls:'conf-mid' },
+];
+
+async function animateDecision(){
+  initDecisionCanvas();
+
+  // Metrics
+  const mb=$('s4-metrics');
+  mb.innerHTML='';
+  for(const m of decisionMetrics){
+    const div=document.createElement('div');
+    div.className='s4-metric';
+    div.innerHTML=`<div class="s4-metric-val" style="color:${m.color};">${m.val}</div><div class="s4-metric-label">${m.label}</div><div class="s4-metric-change ${m.cls}">${m.change}</div>`;
+    mb.appendChild(div);
+    await wait(250);
+    div.classList.add('show');
+  }
+  await wait(400);
+
+  // AI recommendations
+  const rb=$('ai-recs');
+  rb.innerHTML='';
+  for(const r of aiRecommendations){
+    const div=document.createElement('div');
+    div.className='ai-rec';
+    div.innerHTML=`<span class="ai-rec-icon">${r.icon}</span><div class="ai-rec-text"><div class="ai-rec-title">${r.title}</div><div class="ai-rec-desc">${r.desc}</div></div><span class="ai-rec-confidence ${r.confCls}">${r.conf}</span>`;
+    rb.appendChild(div);
+    await wait(400);
+    div.classList.add('show');
+  }
+}
+
+// ═══ MAIN ANIMATION LOOP ═══
+async function mainAnimation(){
+  // Screen 1: Dashboard
+  switchScreen('screen1');
+  setActiveNav('nav-home');
+  await animateDashboard();
+  await wait(2500);
+
+  // Click PPT
+  moveCursor(82, 145);
+  await wait(500);
+  showClick(82, 145);
+  setActiveNav('nav-ppt');
+  await wait(300);
+
+  // Screen 2: PPT
+  hideCursor();
+  switchScreen('screen2');
+  await wait(300);
+  await animatePPT();
+  await wait(3000);
+
+  // Back to dashboard, click news
+  switchScreen('screen1');
+  await wait(300);
+  moveCursor(82, 205);
+  await wait(500);
+  showClick(82, 205);
+  setActiveNav('nav-news');
+  await wait(300);
+
+  // Screen 3: News
+  hideCursor();
+  switchScreen('screen3');
+  await wait(300);
+  await animateNews();
+  await wait(3500);
+
+  // Back to dashboard, click decision
+  switchScreen('screen1');
+  await wait(300);
+  moveCursor(82, 265);
+  await wait(500);
+  showClick(82, 265);
+  setActiveNav('nav-decide');
+  await wait(300);
+
+  // Screen 4: Decision
+  hideCursor();
+  switchScreen('screen4');
+  await wait(300);
+  await animateDecision();
+  await wait(3500);
+
+  // Loop
+  hideCursor();
+  await wait(1000);
+  mainAnimation();
+}
+
+setTimeout(()=>mainAnimation(), 600);
+</script>
+</body>
+</html>
