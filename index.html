@@ -179,7 +179,16 @@
     .feat-title { font-size: .9rem; font-weight: 600; margin-bottom: 4px; color: #0A2342; }
     .feat-desc { font-size: .8rem; color: rgba(10,35,66,.42); line-height: 1.6; }
 
-    /* ── DEMO EMBED ── */
+    /* ── DEMO EMBED (full-width for AI CS) ── */
+    .tab-pane-full.active { display:block !important; padding:40px 0; }
+    .prod-header-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:32px; }
+    .prod-header-row .prod-icon { margin-bottom:8px; }
+    .prod-header-row .prod-tagline { margin-top:10px; }
+    .prod-header-row .prod-tags { display:flex; flex-wrap:wrap; gap:8px; }
+    .demo-embed-full { position:relative; width:100%; max-width:960px; margin:0 auto; border-radius:14px; overflow:hidden; box-shadow:0 12px 48px rgba(0,90,200,.10); border:1px solid #E2E8F0; aspect-ratio:900/540; }
+    .demo-iframe-full { width:900px; height:540px; border:none; display:block; transform-origin:top left; transform:scale(var(--demo-scale-full,1)); }
+
+    /* ── DEMO EMBED (old, keep for compat) ── */
     .demo-embed { position:relative; width:100%; border-radius:12px; overflow:hidden; box-shadow:0 8px 30px rgba(0,90,200,.08); border:1px solid #E2E8F0; aspect-ratio:900/540; }
     .demo-iframe { width:900px; height:540px; border:none; display:block; transform-origin:top left; transform:scale(var(--demo-scale,0.6)); }
 
@@ -396,6 +405,147 @@
   </div>
 </section>
 
+<!-- ══ PRODUCTS ══════════════════════════════════════ -->
+<section id="products">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-label cn-only">产品与服务</div>
+      <div class="section-label en-only">Products & Services</div>
+      <h2 class="section-title cn-only">五大业务线，深耕垂直场景</h2>
+      <h2 class="section-title en-only" style="font-family:'Syne',sans-serif;">Five Verticals. One Mission.</h2>
+      <p class="section-desc cn-only">拒绝通用大模型直接套用，每一个 Agent 都为您的行业量身打造。</p>
+      <p class="section-desc en-only">No generic chatbot wrappers. Every Agent is purpose-built for your industry.</p>
+    </div>
+    <div class="prod-tabs">
+      <button class="tab-btn active" onclick="switchTab('cs',this)">🤖 <span class="cn-only">AI 智能客服</span><span class="en-only">AI Customer Service</span></button>
+      <button class="tab-btn" onclick="switchTab('edu',this)">🎓 <span class="cn-only">教育 Agent</span><span class="en-only">Education Agent</span></button>
+      <button class="tab-btn" onclick="switchTab('mfg',this)">🏭 <span class="cn-only">制造业优化</span><span class="en-only">Manufacturing</span></button>
+      <button class="tab-btn" onclick="switchTab('ceo',this)">👔 <span class="cn-only">董事长助理 Agent</span><span class="en-only">Executive Assistant</span></button>
+      <button class="tab-btn" onclick="switchTab('bid',this)">📑 <span class="cn-only">一键写标书</span><span class="en-only">Bid Proposal Agent</span></button>
+    </div>
+
+    <div class="tab-pane tab-pane-full active" id="tab-cs">
+      <div class="prod-header-row">
+        <div>
+          <div class="prod-icon">🤖</div>
+          <div class="prod-title cn-only">跨境多语言 AI 智能客服</div>
+          <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Cross-Border Multilingual AI CS</div>
+          <div class="prod-tagline cn-only">「一个 Agent，服务全球客户，说他们的母语。」</div>
+          <div class="prod-tagline en-only">"One Agent, serving global customers, in their native language."</div>
+        </div>
+        <div class="prod-tags">
+          <span class="tag cn-only">跨境电商</span><span class="tag en-only">Cross-Border E-commerce</span>
+          <span class="tag cn-only">出海品牌</span><span class="tag en-only">Global Brands</span>
+          <span class="tag cn-only">国际物流</span><span class="tag en-only">Intl. Logistics</span>
+          <span class="tag cn-only">海外 SaaS</span><span class="tag en-only">Global SaaS</span>
+        </div>
+      </div>
+      <div class="demo-embed-full">
+        <iframe src="demo-cs.html" class="demo-iframe-full" loading="lazy" title="AI 跨境客服实时演示"></iframe>
+      </div>
+    </div>
+
+    <div class="tab-pane tab-pane-full" id="tab-edu">
+      <div class="prod-header-row">
+        <div>
+          <div class="prod-icon">🎓</div>
+          <div class="prod-title cn-only">维度之门智教联思 · EduMind Agent</div>
+          <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">EduMind Education Agent</div>
+          <div class="prod-tagline cn-only">「每一个学生，都值得拥有全天候专属学习顾问。」</div>
+          <div class="prod-tagline en-only">"Every student deserves a 24/7 personalized learning advisor."</div>
+        </div>
+        <div class="prod-tags">
+          <span class="tag">K12</span>
+          <span class="tag cn-only">职业教育</span><span class="tag en-only">Vocational Education</span>
+          <span class="tag cn-only">高校管理</span><span class="tag en-only">Higher Education</span>
+          <span class="tag cn-only">企业内训</span><span class="tag en-only">Corporate Training</span>
+        </div>
+      </div>
+      <div class="demo-embed-full">
+        <iframe src="demo-edu.html" class="demo-iframe-full" loading="lazy" title="EduMind 智能教育 Agent 实时演示"></iframe>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-mfg">
+      <div>
+        <div class="prod-icon">🏭</div>
+        <div class="prod-title cn-only">制造业工作流优化</div>
+        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Manufacturing Workflow</div>
+        <div class="prod-pain">
+          <div class="plabel">PAIN POINT</div>
+          <p class="cn-only">信息孤岛严重、排产依赖老师傅经验；异常检测滞后，损耗难以量化。</p>
+          <p class="en-only">Data silos, scheduling dependent on veteran instinct; late anomaly detection, unquantified waste.</p>
+        </div>
+        <div class="prod-tags">
+          <span class="tag cn-only">零部件加工</span><span class="tag en-only">Component Mfg</span>
+          <span class="tag cn-only">电子装配</span><span class="tag en-only">Electronics Assembly</span>
+          <span class="tag cn-only">食品生产</span><span class="tag en-only">Food Production</span>
+          <span class="tag cn-only">汽配供应链</span><span class="tag en-only">Auto Parts Chain</span>
+        </div>
+        <div class="prod-tagline cn-only">「让老师傅的经验，住进每一道工序里。」</div>
+        <div class="prod-tagline en-only">"Put your best veteran's expertise into every step of the process."</div>
+      </div>
+      <ul class="feat-list">
+        <li><div class="feat-ic">📅</div><div><div class="feat-title cn-only">智能排程 Agent</div><div class="feat-title en-only">Smart Scheduling Agent</div><div class="feat-desc cn-only">自动读取 ERP/MES 数据，减少人工协调 80%</div><div class="feat-desc en-only">Auto-reads ERP/MES data, reduces coordination by 80%</div></div></li>
+        <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">质检 AI 辅助</div><div class="feat-title en-only">AI Quality Inspection</div><div class="feat-desc cn-only">视觉识别 + 行业知识库，快速判定，降低漏检率</div><div class="feat-desc en-only">Vision recognition + knowledge base — faster QC, fewer misses</div></div></li>
+        <li><div class="feat-ic">📱</div><div><div class="feat-title cn-only">流程数字化 Agent</div><div class="feat-title en-only">Process Digitization Agent</div><div class="feat-desc cn-only">将口头/纸质 SOP 转化为可追踪数字流程</div><div class="feat-desc en-only">Converts verbal/paper SOPs to trackable digital workflows</div></div></li>
+      </ul>
+    </div>
+
+    <div class="tab-pane" id="tab-ceo">
+      <div>
+        <div class="prod-icon">👔</div>
+        <div class="prod-title cn-only">董事长助理 Agent</div>
+        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Executive Assistant Agent</div>
+        <div class="prod-pain">
+          <div class="plabel">PAIN POINT</div>
+          <p class="cn-only">高管时间极其稀缺，信息过载严重；PPT 汇报材料依赖人工、耗时长；行业动态追踪碎片化，错过关键信号。</p>
+          <p class="en-only">Executives are time-starved with information overload; presentation prep is manual and slow; industry trends tracking is fragmented.</p>
+        </div>
+        <div class="prod-tags">
+          <span class="tag cn-only">企业高管</span><span class="tag en-only">C-Suite</span>
+          <span class="tag cn-only">战略决策</span><span class="tag en-only">Strategic Planning</span>
+          <span class="tag cn-only">投资机构</span><span class="tag en-only">Investment Firms</span>
+          <span class="tag cn-only">集团总部</span><span class="tag en-only">Corporate HQ</span>
+        </div>
+        <div class="prod-tagline cn-only">「让 AI 成为你最高效的幕僚长。」</div>
+        <div class="prod-tagline en-only">"Let AI be your most efficient chief of staff."</div>
+      </div>
+      <ul class="feat-list">
+        <li><div class="feat-ic">📊</div><div><div class="feat-title cn-only">一键生成汇报 PPT</div><div class="feat-title en-only">One-Click Report PPT</div><div class="feat-desc cn-only">输入主题或数据，自动生成专业级公司产品介绍、经营汇报、融资路演 PPT</div><div class="feat-desc en-only">Input a topic or data, auto-generate professional presentations for products, operations, or fundraising</div></div></li>
+        <li><div class="feat-ic">📰</div><div><div class="feat-title cn-only">每日行业资讯推荐</div><div class="feat-title en-only">Daily Industry Briefing</div><div class="feat-desc cn-only">每日自动抓取、筛选、摘要行业最新政策、竞品动态、技术趋势，推送个性化早报</div><div class="feat-desc en-only">Auto-curated daily briefing: policies, competitor moves, tech trends — personalized to your industry</div></div></li>
+        <li><div class="feat-ic">🗂️</div><div><div class="feat-title cn-only">智能决策辅助</div><div class="feat-title en-only">Decision Intelligence</div><div class="feat-desc cn-only">整合内部数据与外部情报，快速生成分析报告与决策建议，辅助高管高效拍板</div><div class="feat-desc en-only">Combines internal data with market intelligence to generate actionable insights for faster decisions</div></div></li>
+      </ul>
+    </div>
+
+    <div class="tab-pane" id="tab-bid">
+      <div>
+        <div class="prod-icon">📑</div>
+        <div class="prod-title cn-only">一键写标书 Agent</div>
+        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Bid Proposal Agent</div>
+        <div class="prod-pain">
+          <div class="plabel">PAIN POINT</div>
+          <p class="cn-only">投标是企业营收命脉，但写标书极度耗时：读懂招标文件要半天，拼凑资质材料要一天，排版校对再一天。中小企业养不起专职标书团队，大企业同时投多个标时人手严重不足。</p>
+          <p class="en-only">Bidding drives revenue, but proposal writing is brutal: half a day to digest requirements, a full day to compile qualifications, another for formatting. SMEs can't afford dedicated teams; large firms run short when bidding on multiple projects.</p>
+        </div>
+        <div class="prod-tags">
+          <span class="tag cn-only">工程建设</span><span class="tag en-only">Construction</span>
+          <span class="tag cn-only">IT 服务</span><span class="tag en-only">IT Services</span>
+          <span class="tag cn-only">政府采购</span><span class="tag en-only">Gov Procurement</span>
+          <span class="tag cn-only">医疗器械</span><span class="tag en-only">Medical Devices</span>
+        </div>
+        <div class="prod-tagline cn-only">「别人还在翻招标文件，你的标书已经生成了。」</div>
+        <div class="prod-tagline en-only">"While others are still reading the RFP, your proposal is already done."</div>
+      </div>
+      <ul class="feat-list">
+        <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">招标文件智能解析</div><div class="feat-title en-only">Smart RFP Parsing</div><div class="feat-desc cn-only">上传招标文件，AI 自动提取评分标准、资质要求、技术参数、交付节点等关键信息，生成结构化摘要</div><div class="feat-desc en-only">Upload RFP docs — AI auto-extracts scoring criteria, qualifications, tech specs, and deadlines into structured summaries</div></div></li>
+        <li><div class="feat-ic">✍️</div><div><div class="feat-title cn-only">一键生成投标方案</div><div class="feat-title en-only">One-Click Proposal Draft</div><div class="feat-desc cn-only">基于企业资质库 + 历史标书 + 招标要求，自动生成技术方案、商务方案、报价书，格式规范、逐条响应</div><div class="feat-desc en-only">Auto-generates technical, commercial, and pricing proposals based on your qualification library, past bids, and current requirements</div></div></li>
+        <li><div class="feat-ic">✅</div><div><div class="feat-title cn-only">合规性自检与优化</div><div class="feat-title en-only">Compliance Check & Optimization</div><div class="feat-desc cn-only">自动对比标书与招标要求，逐项检查是否漏项、偏离或违规，并给出修改建议与评分预估</div><div class="feat-desc en-only">Auto-compares your draft against RFP requirements, flags gaps, deviations, and compliance risks with fix suggestions</div></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- ══ 02 PHILOSOPHY ══════════════════════════════════ -->
 <section id="philosophy">
   <div class="container">
@@ -493,159 +643,6 @@
         <div class="metric-sub cn-only">AI 原生一代</div>
         <div class="metric-sub en-only">AI-Native Generation</div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 04 PRODUCTS ════════════════════════════════════ -->
-<section id="products">
-  <div class="container">
-    <div class="fade-in">
-      <div class="section-label cn-only">04 · 产品与服务</div>
-      <div class="section-label en-only">04 · Products & Services</div>
-      <h2 class="section-title cn-only">五大业务线，深耕垂直场景</h2>
-      <h2 class="section-title en-only" style="font-family:'Syne',sans-serif;">Five Verticals. One Mission.</h2>
-      <p class="section-desc cn-only">拒绝通用大模型直接套用，每一个 Agent 都为您的行业量身打造。</p>
-      <p class="section-desc en-only">No generic chatbot wrappers. Every Agent is purpose-built for your industry.</p>
-    </div>
-    <div class="prod-tabs">
-      <button class="tab-btn active" onclick="switchTab('cs',this)">🤖 <span class="cn-only">AI 智能客服</span><span class="en-only">AI Customer Service</span></button>
-      <button class="tab-btn" onclick="switchTab('edu',this)">🎓 <span class="cn-only">教育 Agent</span><span class="en-only">Education Agent</span></button>
-      <button class="tab-btn" onclick="switchTab('mfg',this)">🏭 <span class="cn-only">制造业优化</span><span class="en-only">Manufacturing</span></button>
-      <button class="tab-btn" onclick="switchTab('ceo',this)">👔 <span class="cn-only">董事长助理 Agent</span><span class="en-only">Executive Assistant</span></button>
-      <button class="tab-btn" onclick="switchTab('bid',this)">📑 <span class="cn-only">一键写标书</span><span class="en-only">Bid Proposal Agent</span></button>
-    </div>
-
-    <div class="tab-pane active" id="tab-cs">
-      <div>
-        <div class="prod-icon">🤖</div>
-        <div class="prod-title cn-only">跨境多语言 AI 智能客服</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Cross-Border Multilingual AI CS</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">跨境业务客户遍布全球，语言不通、时差不同、人力成本高昂。招聘多语种客服团队代价极高，旺季更是无法应对来自不同国家的咨询洪峰。</p>
-          <p class="en-only">Global customers, language barriers, time zone gaps, and soaring labor costs. Building multilingual support teams is prohibitively expensive, especially during peak seasons.</p>
-        </div>
-        <div class="prod-tags">
-          <span class="tag cn-only">跨境电商</span><span class="tag en-only">Cross-Border E-commerce</span>
-          <span class="tag cn-only">出海品牌</span><span class="tag en-only">Global Brands</span>
-          <span class="tag cn-only">国际物流</span><span class="tag en-only">Intl. Logistics</span>
-          <span class="tag cn-only">海外 SaaS</span><span class="tag en-only">Global SaaS</span>
-        </div>
-        <div class="prod-tagline cn-only">「一个 Agent，服务全球客户，说他们的母语。」</div>
-        <div class="prod-tagline en-only">"One Agent, serving global customers, in their native language."</div>
-      </div>
-      <div class="demo-embed">
-        <iframe src="demo-cs.html" class="demo-iframe" loading="lazy" title="AI 跨境客服实时演示"></iframe>
-      </div>
-    </div>
-
-    <div class="tab-pane" id="tab-edu">
-      <div>
-        <div class="prod-icon">🎓</div>
-        <div class="prod-title cn-only">教育 Agent</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Education Agent</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">招生咨询量大、推荐缺个性化；优质师资难以复制，教师重复性工作占用60%精力。</p>
-          <p class="en-only">High inquiry volume, no personalization; great teachers can't scale, repetitive tasks drain 60% of their time.</p>
-        </div>
-        <div class="prod-tags">
-          <span class="tag">K12</span>
-          <span class="tag cn-only">职业教育</span><span class="tag en-only">Vocational Education</span>
-          <span class="tag cn-only">高校管理</span><span class="tag en-only">Higher Education</span>
-          <span class="tag cn-only">企业内训</span><span class="tag en-only">Corporate Training</span>
-        </div>
-        <div class="endorsement">
-          <span style="font-size:1.2rem;">🏛️</span>
-          <p><strong class="cn-only">合作背书：</strong><strong class="en-only">Endorsed by: </strong><span class="cn-only">北京师范大学 · 国内某知名教育集团 · 北京化学会</span><span class="en-only">Beijing Normal University · Leading Education Group · Beijing Chemical Society</span></p>
-        </div>
-        <div class="prod-tagline cn-only">「每一个学生，都值得拥有全天候专属学习顾问。」</div>
-        <div class="prod-tagline en-only">"Every student deserves a 24/7 personalized learning advisor."</div>
-      </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">📋</div><div><div class="feat-title cn-only">智能招生顾问 Agent</div><div class="feat-title en-only">Smart Enrollment Agent</div><div class="feat-desc cn-only">自动完成课程咨询、学员测评、报名引导全流程</div><div class="feat-desc en-only">Full auto-flow: consultation → assessment → enrollment</div></div></li>
-        <li><div class="feat-ic">🗺️</div><div><div class="feat-title cn-only">个性化学习路径推荐</div><div class="feat-title en-only">Personalized Learning Paths</div><div class="feat-desc cn-only">基于历史数据与学习目标，动态生成专属学习计划</div><div class="feat-desc en-only">Dynamic plans generated from historical data and individual goals</div></div></li>
-        <li><div class="feat-ic">✏️</div><div><div class="feat-title cn-only">教学辅助 Agent</div><div class="feat-title en-only">Teaching Assistant Agent</div><div class="feat-desc cn-only">批改作业、生成练习题、总结课堂重点，解放教师</div><div class="feat-desc en-only">Grades assignments, generates exercises, summarizes lessons</div></div></li>
-      </ul>
-    </div>
-
-    <div class="tab-pane" id="tab-mfg">
-      <div>
-        <div class="prod-icon">🏭</div>
-        <div class="prod-title cn-only">制造业工作流优化</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Manufacturing Workflow</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">信息孤岛严重、排产依赖老师傅经验；异常检测滞后，损耗难以量化。</p>
-          <p class="en-only">Data silos, scheduling dependent on veteran instinct; late anomaly detection, unquantified waste.</p>
-        </div>
-        <div class="prod-tags">
-          <span class="tag cn-only">零部件加工</span><span class="tag en-only">Component Mfg</span>
-          <span class="tag cn-only">电子装配</span><span class="tag en-only">Electronics Assembly</span>
-          <span class="tag cn-only">食品生产</span><span class="tag en-only">Food Production</span>
-          <span class="tag cn-only">汽配供应链</span><span class="tag en-only">Auto Parts Chain</span>
-        </div>
-        <div class="prod-tagline cn-only">「让老师傅的经验，住进每一道工序里。」</div>
-        <div class="prod-tagline en-only">"Put your best veteran's expertise into every step of the process."</div>
-      </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">📅</div><div><div class="feat-title cn-only">智能排程 Agent</div><div class="feat-title en-only">Smart Scheduling Agent</div><div class="feat-desc cn-only">自动读取 ERP/MES 数据，减少人工协调 80%</div><div class="feat-desc en-only">Auto-reads ERP/MES data, reduces coordination by 80%</div></div></li>
-        <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">质检 AI 辅助</div><div class="feat-title en-only">AI Quality Inspection</div><div class="feat-desc cn-only">视觉识别 + 行业知识库，快速判定，降低漏检率</div><div class="feat-desc en-only">Vision recognition + knowledge base — faster QC, fewer misses</div></div></li>
-        <li><div class="feat-ic">📱</div><div><div class="feat-title cn-only">流程数字化 Agent</div><div class="feat-title en-only">Process Digitization Agent</div><div class="feat-desc cn-only">将口头/纸质 SOP 转化为可追踪数字流程</div><div class="feat-desc en-only">Converts verbal/paper SOPs to trackable digital workflows</div></div></li>
-      </ul>
-    </div>
-
-    <div class="tab-pane" id="tab-ceo">
-      <div>
-        <div class="prod-icon">👔</div>
-        <div class="prod-title cn-only">董事长助理 Agent</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Executive Assistant Agent</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">高管时间极其稀缺，信息过载严重；PPT 汇报材料依赖人工、耗时长；行业动态追踪碎片化，错过关键信号。</p>
-          <p class="en-only">Executives are time-starved with information overload; presentation prep is manual and slow; industry trends tracking is fragmented.</p>
-        </div>
-        <div class="prod-tags">
-          <span class="tag cn-only">企业高管</span><span class="tag en-only">C-Suite</span>
-          <span class="tag cn-only">战略决策</span><span class="tag en-only">Strategic Planning</span>
-          <span class="tag cn-only">投资机构</span><span class="tag en-only">Investment Firms</span>
-          <span class="tag cn-only">集团总部</span><span class="tag en-only">Corporate HQ</span>
-        </div>
-        <div class="prod-tagline cn-only">「让 AI 成为你最高效的幕僚长。」</div>
-        <div class="prod-tagline en-only">"Let AI be your most efficient chief of staff."</div>
-      </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">📊</div><div><div class="feat-title cn-only">一键生成汇报 PPT</div><div class="feat-title en-only">One-Click Report PPT</div><div class="feat-desc cn-only">输入主题或数据，自动生成专业级公司产品介绍、经营汇报、融资路演 PPT</div><div class="feat-desc en-only">Input a topic or data, auto-generate professional presentations for products, operations, or fundraising</div></div></li>
-        <li><div class="feat-ic">📰</div><div><div class="feat-title cn-only">每日行业资讯推荐</div><div class="feat-title en-only">Daily Industry Briefing</div><div class="feat-desc cn-only">每日自动抓取、筛选、摘要行业最新政策、竞品动态、技术趋势，推送个性化早报</div><div class="feat-desc en-only">Auto-curated daily briefing: policies, competitor moves, tech trends — personalized to your industry</div></div></li>
-        <li><div class="feat-ic">🗂️</div><div><div class="feat-title cn-only">智能决策辅助</div><div class="feat-title en-only">Decision Intelligence</div><div class="feat-desc cn-only">整合内部数据与外部情报，快速生成分析报告与决策建议，辅助高管高效拍板</div><div class="feat-desc en-only">Combines internal data with market intelligence to generate actionable insights for faster decisions</div></div></li>
-      </ul>
-    </div>
-
-    <div class="tab-pane" id="tab-bid">
-      <div>
-        <div class="prod-icon">📑</div>
-        <div class="prod-title cn-only">一键写标书 Agent</div>
-        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Bid Proposal Agent</div>
-        <div class="prod-pain">
-          <div class="plabel">PAIN POINT</div>
-          <p class="cn-only">投标是企业营收命脉，但写标书极度耗时：读懂招标文件要半天，拼凑资质材料要一天，排版校对再一天。中小企业养不起专职标书团队，大企业同时投多个标时人手严重不足。</p>
-          <p class="en-only">Bidding drives revenue, but proposal writing is brutal: half a day to digest requirements, a full day to compile qualifications, another for formatting. SMEs can't afford dedicated teams; large firms run short when bidding on multiple projects.</p>
-        </div>
-        <div class="prod-tags">
-          <span class="tag cn-only">工程建设</span><span class="tag en-only">Construction</span>
-          <span class="tag cn-only">IT 服务</span><span class="tag en-only">IT Services</span>
-          <span class="tag cn-only">政府采购</span><span class="tag en-only">Gov Procurement</span>
-          <span class="tag cn-only">医疗器械</span><span class="tag en-only">Medical Devices</span>
-        </div>
-        <div class="prod-tagline cn-only">「别人还在翻招标文件，你的标书已经生成了。」</div>
-        <div class="prod-tagline en-only">"While others are still reading the RFP, your proposal is already done."</div>
-      </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">招标文件智能解析</div><div class="feat-title en-only">Smart RFP Parsing</div><div class="feat-desc cn-only">上传招标文件，AI 自动提取评分标准、资质要求、技术参数、交付节点等关键信息，生成结构化摘要</div><div class="feat-desc en-only">Upload RFP docs — AI auto-extracts scoring criteria, qualifications, tech specs, and deadlines into structured summaries</div></div></li>
-        <li><div class="feat-ic">✍️</div><div><div class="feat-title cn-only">一键生成投标方案</div><div class="feat-title en-only">One-Click Proposal Draft</div><div class="feat-desc cn-only">基于企业资质库 + 历史标书 + 招标要求，自动生成技术方案、商务方案、报价书，格式规范、逐条响应</div><div class="feat-desc en-only">Auto-generates technical, commercial, and pricing proposals based on your qualification library, past bids, and current requirements</div></div></li>
-        <li><div class="feat-ic">✅</div><div><div class="feat-title cn-only">合规性自检与优化</div><div class="feat-title en-only">Compliance Check & Optimization</div><div class="feat-desc cn-only">自动对比标书与招标要求，逐项检查是否漏项、偏离或违规，并给出修改建议与评分预估</div><div class="feat-desc en-only">Auto-compares your draft against RFP requirements, flags gaps, deviations, and compliance risks with fix suggestions</div></div></li>
-      </ul>
     </div>
   </div>
 </section>
@@ -949,16 +946,21 @@ function switchTab(id,btn){
   if(btn)btn.classList.add('active');
   else document.querySelectorAll('.tab-btn')[['cs','edu','mfg','ceo','bid'].indexOf(id)].classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+  setTimeout(function(){
+    document.querySelectorAll('.demo-embed-full').forEach(function(full){
+      if(full.clientWidth>0){var s=full.clientWidth/900; full.style.setProperty('--demo-scale-full',s);}
+    });
+  },50);
 }
 
 /* ── DEMO IFRAME SCALING ── */
 (function(){
   function scaleDemo(){
-    const wrap=document.querySelector('.demo-embed');
-    if(!wrap)return;
-    const w=wrap.clientWidth;
-    const s=w/900;
-    wrap.style.setProperty('--demo-scale',s);
+    document.querySelectorAll('.demo-embed-full').forEach(function(full){
+      if(full.clientWidth>0){const s=full.clientWidth/900; full.style.setProperty('--demo-scale-full',s);}
+    });
+    const small=document.querySelector('.demo-embed');
+    if(small){const s=small.clientWidth/900; small.style.setProperty('--demo-scale',s);}
   }
   scaleDemo();
   window.addEventListener('resize',scaleDemo);

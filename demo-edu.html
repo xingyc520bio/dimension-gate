@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>维度之门智教联思 · EduMind AI 演示</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#F0F4F0; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'DM Sans','PingFang SC',sans-serif; overflow:hidden; }
+
+  .laptop { position:relative; width:900px; }
+  .laptop-screen { background:#fff; border-radius:12px; border:1px solid #D4E8D4; overflow:hidden; box-shadow: 0 25px 80px rgba(0,120,60,.08), 0 4px 20px rgba(0,0,0,.04); }
+  .laptop-base { width:60%; height:12px; margin:0 auto; background:linear-gradient(180deg,#D8E6D8,#E0ECE0); border-radius:0 0 8px 8px; }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:#F8FBF8; border-bottom:1px solid #D4E8D4; }
+  .topbar-left { display:flex; align-items:center; gap:8px; }
+  .wdot { width:8px; height:8px; border-radius:50%; }
+  .wdot-r { background:#ff5f57; } .wdot-y { background:#ffbd2e; } .wdot-g { background:#28c840; }
+  .topbar-title { font-size:12px; color:#6B8F71; margin-left:12px; font-family:'JetBrains Mono',monospace; }
+  .topbar-right { display:flex; gap:6px; align-items:center; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:#22C55E; animation:pulse-dot 2s infinite; }
+  .status-text { font-size:11px; color:#6B8F71; font-family:'JetBrains Mono',monospace; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .app { height:480px; position:relative; overflow:hidden; }
+  .screen { position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  .screen.active { opacity:1; pointer-events:auto; }
+
+  /* ══ BRAND LOGO ══ */
+  .brand-logo { display:flex; align-items:center; gap:7px; }
+  .brand-icon { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#4CAF50,#2E7D32); display:flex; align-items:center; justify-content:center; }
+  .brand-icon svg { width:16px; height:16px; }
+  .brand-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; color:#2D5A3D; letter-spacing:-.02em; }
+  .brand-sub { font-size:9px; color:#6B8F71; font-family:'JetBrains Mono',monospace; letter-spacing:.03em; }
+
+  /* ══ SCREEN 1 ══ */
+  .s1-main { flex:1; display:flex; }
+  .s1-sidebar { width:190px; background:#F0F7F0; border-right:1px solid #D4E8D4; display:flex; flex-direction:column; }
+  .s1-sidebar-header { padding:14px 16px; border-bottom:1px solid #D4E8D4; }
+  .s1-nav { padding:8px; flex:1; }
+  .s1-nav-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; margin-bottom:4px; cursor:pointer; transition:all .25s; }
+  .s1-nav-item.active { background:#DCF0DC; border:1px solid #A8D8A8; }
+  .s1-nav-item:not(.active) { border:1px solid transparent; }
+  .s1-nav-icon { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .s1-nav-icon svg { width:14px; height:14px; }
+  .s1-nav-icon.ic-chat { background:rgba(76,175,80,.12); color:#2E7D32; }
+  .s1-nav-icon.ic-viz { background:rgba(255,152,0,.12); color:#E65100; }
+  .s1-nav-icon.ic-lib { background:rgba(33,150,243,.12); color:#1565C0; }
+  .s1-nav-icon.ic-stats { background:rgba(156,39,176,.12); color:#7B1FA2; }
+  .s1-nav-text { font-size:12px; font-weight:600; color:#2D5A3D; }
+  .s1-nav-desc { font-size:10px; color:#6B8F71; margin-top:2px; }
+
+  .s1-chat { flex:1; display:flex; flex-direction:column; background:#fff; }
+  .s1-chat-header { padding:12px 20px; border-bottom:1px solid #E2EEE2; display:flex; align-items:center; justify-content:space-between; }
+  .s1-chat-title { font-size:13px; font-weight:700; color:#2D5A3D; }
+  .s1-agent-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; font-family:'JetBrains Mono',monospace; background:#E8F5E9; color:#2E7D32; border:1px solid #A5D6A7; }
+
+  .s1-messages { flex:1; padding:20px; overflow:hidden; display:flex; flex-direction:column; gap:14px; background:#FAFCFA; }
+  .s1-msg { display:flex; gap:10px; align-items:flex-start; opacity:0; transform:translateY(15px); transition:all .4s ease; max-width:92%; }
+  .s1-msg.show { opacity:1; transform:translateY(0); }
+  .s1-msg-user { align-self:flex-end; flex-direction:row-reverse; }
+  .s1-msg-avatar { width:30px; height:30px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .s1-msg-bot .s1-msg-avatar { background:#E8F5E9; }
+  .s1-msg-user .s1-msg-avatar { background:#FFF3E0; border-radius:50%; }
+  .s1-msg-avatar svg { width:16px; height:16px; }
+  .s1-msg-bubble { padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.7; }
+  .s1-msg-user .s1-msg-bubble { background:#FFF3E0; color:#4E342E; border:1px solid #FFE0B2; border-top-right-radius:4px; }
+  .s1-msg-bot .s1-msg-bubble { background:#E8F5E9; color:#1B5E20; border:1px solid #A5D6A7; border-top-left-radius:4px; }
+  .typing-cursor { display:inline-block; width:2px; height:14px; background:#2E7D32; margin-left:2px; animation:blink-cursor .6s infinite; vertical-align:text-bottom; }
+  @keyframes blink-cursor { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+  /* LaTeX-style math */
+  .math-block { margin:10px 0; padding:12px 16px; background:#fff; border:1px solid #C8E6C9; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:13px; color:#1B5E20; line-height:1.8; }
+  .math-block .math-label { font-size:10px; color:#6B8F71; letter-spacing:.08em; margin-bottom:6px; font-weight:600; }
+  .math-block .math-eq { font-size:14px; color:#2D5A3D; }
+  .math-block .math-var { font-style:italic; }
+  .math-block sup { font-size:10px; vertical-align:super; }
+  .math-block sub { font-size:9px; vertical-align:sub; }
+  .math-meta { display:flex; gap:12px; margin-top:8px; font-size:11px; color:#6B8F71; }
+  .math-meta span { padding:2px 8px; background:#F1F8F1; border-radius:6px; border:1px solid #E0F0E0; }
+
+  .s1-input { padding:12px 20px; border-top:1px solid #E2EEE2; display:flex; align-items:center; gap:10px; background:#fff; }
+  .s1-input-box { flex:1; background:#F5F9F5; border:1px solid #D4E8D4; border-radius:10px; padding:10px 14px; font-size:12px; color:#2D5A3D; cursor:text; transition:all .3s; min-height:38px; display:flex; align-items:center; }
+  .s1-input-box.focused { border-color:#4CAF50; box-shadow:0 0 0 3px rgba(76,175,80,.15); }
+  .s1-input-box.has-text { color:#2D5A3D; }
+  .s1-input-box .placeholder { color:#94B89A; }
+  .s1-send { width:34px; height:34px; border-radius:10px; background:#4CAF50; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; transition:all .25s; opacity:.5; }
+  .s1-send.active { opacity:1; transform:scale(1.05); }
+
+  .s2-interact-btn { margin-top:10px; padding:8px 16px; width:100%; border-radius:10px; background:#fff; border:2px solid #4CAF50; color:#4CAF50; font-size:12px; font-weight:700; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .s2-interact-btn.pulse { animation:btn-pulse 1.5s ease-in-out infinite; }
+  @keyframes btn-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,.4);} 50%{box-shadow:0 0 0 8px rgba(76,175,80,0);} }
+
+  /* ══ SCREEN 2 ══ */
+  .s2-toolbar { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#F0F7F0; border-bottom:1px solid #D4E8D4; }
+  .s2-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #D4E8D4; font-size:11px; color:#4A7A52; cursor:pointer; }
+  .s2-title { font-size:13px; font-weight:700; color:#2D5A3D; flex:1; }
+  .s2-badge { padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; background:#E8F5E9; color:#2E7D32; border:1px solid #A5D6A7; font-family:'JetBrains Mono',monospace; }
+
+  .s2-content { flex:1; display:flex; padding:20px; gap:20px; background:#FAFCFA; }
+  .s2-viz { flex:1; background:#fff; border-radius:14px; border:1px solid #D4E8D4; overflow:hidden; display:flex; flex-direction:column; }
+  .s2-viz-header { padding:12px 16px; border-bottom:1px solid #E8F0E8; display:flex; align-items:center; justify-content:space-between; }
+  .s2-viz-title { font-size:12px; font-weight:700; color:#2D5A3D; }
+  .s2-viz-tag { font-size:9px; padding:2px 8px; background:#FFF3E0; color:#E65100; border-radius:10px; border:1px solid #FFE0B2; }
+  .s2-canvas-area { flex:1; position:relative; overflow:hidden; }
+  .math-canvas { width:100%; height:100%; }
+  .s2-controls { display:flex; gap:8px; padding:10px 16px; border-top:1px solid #E8F0E8; background:#F8FBF8; }
+  .s2-ctrl-btn { padding:6px 14px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; transition:all .25s; border:1px solid; }
+  .s2-ctrl-play { background:#4CAF50; color:#fff; border-color:#388E3C; }
+  .s2-ctrl-step { background:#fff; color:#4CAF50; border-color:#A5D6A7; }
+  .s2-ctrl-reset { background:#fff; color:#78909C; border-color:#CFD8DC; }
+
+  .s2-sidebar { width:220px; display:flex; flex-direction:column; gap:12px; }
+  .s2-question { background:#fff; border-radius:14px; border:1px solid #D4E8D4; padding:14px; }
+  .s2-question h5 { font-size:10px; color:#6B8F71; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .s2-question-text { font-size:12px; color:#2D5A3D; line-height:1.7; font-family:'JetBrains Mono',monospace; }
+  .s2-solution { background:#fff; border-radius:14px; border:1px solid #D4E8D4; padding:14px; flex:1; overflow:hidden; }
+  .s2-solution h5 { font-size:10px; color:#6B8F71; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; font-family:'JetBrains Mono',monospace; }
+  .s2-step { display:flex; gap:8px; margin-bottom:8px; opacity:0; transform:translateX(-10px); transition:all .4s ease; }
+  .s2-step.show { opacity:1; transform:translateX(0); }
+  .s2-step-num { width:20px; height:20px; border-radius:50%; background:#E8F5E9; color:#2E7D32; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+  .s2-step-text { font-size:11px; color:#4A7A52; line-height:1.5; }
+  .s2-step-text strong { color:#2D5A3D; }
+
+  /* ══ SCREEN 3 ══ */
+  .s3-header { display:flex; align-items:center; gap:10px; padding:10px 20px; background:#F0F7F0; border-bottom:1px solid #D4E8D4; }
+  .s3-back { padding:5px 12px; border-radius:8px; background:#fff; border:1px solid #D4E8D4; font-size:11px; color:#4A7A52; cursor:pointer; }
+  .s3-title { font-size:13px; font-weight:700; color:#2D5A3D; flex:1; }
+  .s3-search { padding:6px 14px; border-radius:20px; background:#fff; border:1px solid #D4E8D4; font-size:11px; color:#6B8F71; width:180px; }
+
+  .s3-body { flex:1; display:flex; overflow:hidden; }
+  .s3-categories { width:150px; background:#F0F7F0; border-right:1px solid #D4E8D4; padding:10px 8px; overflow-y:auto; }
+  .s3-cat { display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; margin-bottom:3px; cursor:pointer; transition:all .25s; font-size:12px; color:#4A7A52; }
+  .s3-cat.active { background:#DCF0DC; color:#1B5E20; font-weight:700; border:1px solid #A5D6A8; }
+  .s3-cat:not(.active) { border:1px solid transparent; }
+  .s3-cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .s3-cat-count { margin-left:auto; font-size:10px; color:#6B8F71; font-family:'JetBrains Mono',monospace; }
+
+  .s3-grid-wrap { flex:1; padding:16px; overflow:hidden; }
+  .s3-grid-title { font-size:12px; font-weight:700; color:#2D5A3D; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .s3-grid-count { font-size:10px; color:#6B8F71; font-family:'JetBrains Mono',monospace; }
+  .s3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .s3-card { background:#fff; border:1px solid #E2EEE2; border-radius:12px; overflow:hidden; cursor:pointer; transition:all .3s; opacity:0; transform:translateY(15px); }
+  .s3-card.show { opacity:1; transform:translateY(0); }
+  .s3-card:hover { border-color:#4CAF50; transform:translateY(-3px); box-shadow:0 8px 24px rgba(76,175,80,.1); }
+  .s3-card-preview { height:80px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .s3-card-preview .preview-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .s3-card-preview .preview-icon svg { width:20px; height:20px; }
+  .s3-card-info { padding:8px 10px; border-top:1px solid #E8F0E8; }
+  .s3-card-name { font-size:11px; font-weight:600; color:#2D5A3D; margin-bottom:2px; }
+  .s3-card-meta { font-size:9px; color:#6B8F71; display:flex; justify-content:space-between; }
+  .s3-card-badge { font-size:8px; padding:1px 6px; border-radius:8px; background:#E8F5E9; color:#2E7D32; }
+
+  .click-ripple { position:absolute; width:24px; height:24px; border-radius:50%; background:rgba(76,175,80,.3); border:2px solid rgba(76,175,80,.6); pointer-events:none; z-index:999; animation:ripple .6s ease-out forwards; }
+  @keyframes ripple { 0%{transform:scale(0);opacity:1;} 100%{transform:scale(2.5);opacity:0;} }
+
+  .cursor-pointer { position:absolute; z-index:1000; pointer-events:none; width:20px; height:20px; transition:left .6s cubic-bezier(.4,0,.2,1), top .6s cubic-bezier(.4,0,.2,1); opacity:0; }
+  .cursor-pointer.show { opacity:1; }
+  .cursor-pointer svg { width:20px; height:20px; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.2)); }
+</style>
+</head>
+<body>
+
+<div class="laptop">
+  <div class="laptop-screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="wdot wdot-r"></div><div class="wdot wdot-y"></div><div class="wdot wdot-g"></div>
+        <span class="topbar-title">维度之门智教联思 · EduMind AI</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-dot"></div>
+        <span class="status-text">Agent 运行中</span>
+      </div>
+    </div>
+    <div class="app" id="app">
+
+      <!-- ══ SCREEN 1 ══ -->
+      <div class="screen active" id="screen1">
+        <div class="s1-main">
+          <div class="s1-sidebar">
+            <div class="s1-sidebar-header">
+              <div class="brand-logo">
+                <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+                <div>
+                  <div class="brand-name">EduMind AI</div>
+                  <div class="brand-sub">智教联思</div>
+                </div>
+              </div>
+            </div>
+            <div class="s1-nav">
+              <div class="s1-nav-item active">
+                <div class="s1-nav-icon ic-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                <div><div class="s1-nav-text">智能出题</div><div class="s1-nav-desc">AI 对话式出题</div></div>
+              </div>
+              <div class="s1-nav-item">
+                <div class="s1-nav-icon ic-viz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></div>
+                <div><div class="s1-nav-text">可视化动画</div><div class="s1-nav-desc">交互式题目动画</div></div>
+              </div>
+              <div class="s1-nav-item">
+                <div class="s1-nav-icon ic-lib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+                <div><div class="s1-nav-text">动画模板库</div><div class="s1-nav-desc">全学科课堂动画</div></div>
+              </div>
+              <div class="s1-nav-item">
+                <div class="s1-nav-icon ic-stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <div><div class="s1-nav-text">学情分析</div><div class="s1-nav-desc">班级学习报告</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="s1-chat">
+            <div class="s1-chat-header">
+              <div class="s1-chat-title">智能出题对话</div>
+              <div class="s1-agent-badge">EduMind v2.6</div>
+            </div>
+            <div class="s1-messages" id="s1-messages"></div>
+            <div class="s1-input">
+              <div class="s1-input-box" id="s1-input-box"><span class="placeholder">输入教学需求...</span></div>
+              <div class="s1-send" id="s1-send">↑</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 2 ══ -->
+      <div class="screen" id="screen2">
+        <div class="s2-toolbar">
+          <div class="s2-back">&larr; 返回</div>
+          <div class="s2-title">数形结合 · 可视化动画</div>
+          <div class="s2-badge">INTERACTIVE</div>
+        </div>
+        <div class="s2-content">
+          <div class="s2-viz">
+            <div class="s2-viz-header">
+              <div class="s2-viz-title">函数图像与几何交互</div>
+              <div class="s2-viz-tag">可拖拽交互</div>
+            </div>
+            <div class="s2-canvas-area">
+              <canvas class="math-canvas" id="mathCanvas"></canvas>
+            </div>
+            <div class="s2-controls">
+              <div class="s2-ctrl-btn s2-ctrl-play">&#9654; 播放动画</div>
+              <div class="s2-ctrl-btn s2-ctrl-step">下一步</div>
+              <div class="s2-ctrl-btn s2-ctrl-reset">&#8634; 重置</div>
+            </div>
+          </div>
+          <div class="s2-sidebar">
+            <div class="s2-question">
+              <h5>题目</h5>
+              <div class="s2-question-text" id="s2-question-text"></div>
+            </div>
+            <div class="s2-solution">
+              <h5>解题步骤</h5>
+              <div id="s2-steps"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 3 ══ -->
+      <div class="screen" id="screen3">
+        <div class="s3-header">
+          <div class="s3-back">&larr; 返回</div>
+          <div class="s3-title">课堂交互动画模板</div>
+          <div class="s3-search">搜索动画模板...</div>
+        </div>
+        <div class="s3-body">
+          <div class="s3-categories" id="s3-categories"></div>
+          <div class="s3-grid-wrap">
+            <div class="s3-grid-title" id="s3-grid-title"></div>
+            <div class="s3-grid" id="s3-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cursor-pointer" id="cursor">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 3l14 8-6.5 2L8 19.5V3z" fill="#2D5A3D" stroke="#fff" stroke-width="1"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="laptop-base"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+// ── 打字效果 ──
+function typeText(el, text, speed=22){
+  return new Promise(resolve=>{
+    let i=0;
+    const cursor = document.createElement('span');
+    cursor.className='typing-cursor';
+    el.textContent='';
+    el.appendChild(cursor);
+    const iv = setInterval(()=>{
+      if(i<text.length){
+        el.insertBefore(document.createTextNode(text[i]), cursor);
+        i++;
+      } else { clearInterval(iv); cursor.remove(); resolve(); }
+    }, speed);
+  });
+}
+
+function typeHTML(el, html, speed=15){
+  return new Promise(resolve=>{
+    el.innerHTML='';
+    const cursor = document.createElement('span');
+    cursor.className='typing-cursor';
+    el.appendChild(cursor);
+    let i=0;
+    const iv = setInterval(()=>{
+      if(i<html.length){
+        // handle HTML tags — insert them instantly
+        if(html[i]==='<'){
+          const end = html.indexOf('>',i);
+          if(end!==-1){
+            const frag = document.createRange().createContextualFragment(html.substring(i,end+1));
+            el.insertBefore(frag,cursor);
+            i=end+1;
+            return;
+          }
+        }
+        el.insertBefore(document.createTextNode(html[i]),cursor);
+        i++;
+      } else { clearInterval(iv); cursor.remove(); resolve(); }
+    }, speed);
+  });
+}
+
+function typeInput(el, text, speed=50){
+  return new Promise(resolve=>{
+    el.innerHTML='';
+    el.classList.add('focused','has-text');
+    let i=0;
+    const cursor = document.createElement('span');
+    cursor.className='typing-cursor';
+    el.appendChild(cursor);
+    const iv = setInterval(()=>{
+      if(i<text.length){
+        el.insertBefore(document.createTextNode(text[i]),cursor);
+        i++;
+      } else { clearInterval(iv); resolve(); }
+    }, speed);
+  });
+}
+
+function showClick(x,y){
+  const r=document.createElement('div');
+  r.className='click-ripple';
+  r.style.left=(x-12)+'px'; r.style.top=(y-12)+'px';
+  $('app').appendChild(r);
+  setTimeout(()=>r.remove(),600);
+}
+function moveCursor(x,y){ const c=$('cursor'); c.classList.add('show'); c.style.left=x+'px'; c.style.top=y+'px'; }
+function hideCursor(){ $('cursor').classList.remove('show'); }
+function switchScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
+
+// Bot avatar SVG (book icon)
+const botAvatarSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>';
+const userAvatarSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#E65100" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+function addMessage(container, role, content, isHTML){
+  return new Promise(async resolve=>{
+    const div=document.createElement('div');
+    div.className=`s1-msg s1-msg-${role}`;
+    const avatar = role==='bot' ? botAvatarSVG : userAvatarSVG;
+    div.innerHTML=`<div class="s1-msg-avatar">${avatar}</div><div class="s1-msg-bubble"></div>`;
+    container.appendChild(div);
+    await wait(150);
+    div.classList.add('show');
+    const bubble=div.querySelector('.s1-msg-bubble');
+    if(role==='bot'){
+      await wait(400);
+      if(isHTML) await typeHTML(bubble, content, 12);
+      else await typeText(bubble, content, 18);
+    } else {
+      bubble.textContent=content;
+    }
+    resolve();
+  });
+}
+
+// ══ SCREEN 2: Math Canvas ══
+function initMathCanvas(){
+  const canvas=$('mathCanvas');
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=rect.width||440; canvas.height=rect.height||280;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
+
+  function drawGrid(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#E8F0E8'; ctx.lineWidth=1;
+    for(let x=0;x<=W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<=H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.strokeStyle='#94B89A'; ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+    ctx.fillStyle='#6B8F71'; ctx.font='10px JetBrains Mono';
+    ctx.fillText('x',W-15,cy-8); ctx.fillText('y',cx+8,15); ctx.fillText('O',cx+5,cy+15);
+    for(let i=-6;i<=6;i++){
+      if(i===0) continue;
+      const sx=cx+i*30, sy=cy-i*30;
+      ctx.beginPath();ctx.moveTo(sx,cy-3);ctx.lineTo(sx,cy+3);ctx.stroke();
+      ctx.fillText(i+'',sx-4,cy+15);
+      if(i>-5&&i<5){ctx.beginPath();ctx.moveTo(cx-3,sy);ctx.lineTo(cx+3,sy);ctx.stroke();ctx.fillText(i+'',cx+8,sy+4);}
+    }
+  }
+
+  let parabolaP=0, lineP=0, showInter=false, areaP=0;
+  let animating=false, phase=0, t=0;
+
+  function drawParabola(p){
+    ctx.beginPath(); ctx.strokeStyle='#4CAF50'; ctx.lineWidth=2.5;
+    const steps=Math.floor(p*200);
+    for(let i=0;i<=steps;i++){const v=(i/200)*6-3;const x=cx+v*30;const y=cy-(v*v-4)*30;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    ctx.stroke();
+    if(p>=1){ctx.fillStyle='#4CAF50';ctx.font='bold 12px DM Sans';ctx.fillText('y = x\u00B2 \u2212 4',cx+100,cy-5*30+20);}
+  }
+  function drawLine(p){
+    ctx.beginPath();ctx.strokeStyle='#FF7043';ctx.lineWidth=2.5;ctx.setLineDash([6,3]);
+    const x1=cx+(-2)*30,y1=cy-((-2)*2-4)*30,x2=cx+4*30,y2=cy-(4*2-4)*30;
+    ctx.moveTo(x1,y1);ctx.lineTo(x1+(x2-x1)*p,y1+(y2-y1)*p);ctx.stroke();ctx.setLineDash([]);
+    if(p>=1){ctx.fillStyle='#FF7043';ctx.font='bold 12px DM Sans';ctx.fillText('y = 2x \u2212 4',cx+3.5*30,cy-2.5*30);}
+  }
+  function drawIntersections(s){
+    if(!s) return;
+    [{x:0,y:-4,l:'A(0,\u22124)'},{x:3,y:5,l:'B(3,5)'}].forEach(p=>{
+      const sx=cx+p.x*30,sy=cy-p.y*30;
+      ctx.beginPath();ctx.arc(sx,sy,5,0,Math.PI*2);ctx.fillStyle='#E53935';ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#C62828';ctx.font='bold 11px JetBrains Mono';ctx.fillText(p.l,sx+8,sy-8);
+    });
+  }
+  function drawArea(p){
+    if(p<=0) return;
+    ctx.beginPath();ctx.globalAlpha=.15*p;ctx.fillStyle='#4CAF50';
+    for(let i=0;i<=60;i++){const v=(i/60)*3;const x=cx+v*30;const y=cy-(2*v-4)*30;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    for(let i=60;i>=0;i--){const v=(i/60)*3;const x=cx+v*30;const y=cy-(v*v-4)*30;ctx.lineTo(x,y);}
+    ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+    if(p>=1){ctx.fillStyle='#2E7D32';ctx.font='bold 12px DM Sans';ctx.fillText('S = 9/2',cx+1.2*30,cy+.5*30);}
+  }
+
+  function render(){drawGrid();if(parabolaP>0)drawParabola(parabolaP);if(lineP>0)drawLine(lineP);drawIntersections(showInter);drawArea(areaP);}
+
+  function animate(){
+    if(!animating) return;
+    t+=.02;
+    if(phase===0){parabolaP=Math.min(1,t/1);if(parabolaP>=1){phase=1;t=0;showStepAnim(0);}}
+    else if(phase===1){lineP=Math.min(1,t/.8);if(lineP>=1){phase=2;t=0;showStepAnim(1);}}
+    else if(phase===2){if(t>.3){showInter=true;phase=3;t=0;showStepAnim(2);}}
+    else if(phase===3){areaP=Math.min(1,t/1);if(areaP>=1){phase=4;t=0;showStepAnim(3);}}
+    else{animating=false;}
+    render();
+    if(animating) requestAnimationFrame(animate);
+  }
+
+  window.vizStart=function(){parabolaP=0;lineP=0;showInter=false;areaP=0;phase=0;t=0;animating=true;animate();};
+  render();
+}
+
+const solutionSteps=[
+  {text:'<strong>画抛物线</strong> y = x\u00B2 \u2212 4\uff0c顶点 (0,\u22124)'},
+  {text:'<strong>画直线</strong> y = 2x \u2212 4\uff0c过 (0,\u22124) 和 (2,0)'},
+  {text:'<strong>联立求交点</strong>\uff1ax\u00B2\u22124=2x\u22124 \u2192 x=0, x=3'},
+  {text:'<strong>定积分求面积</strong> S = \u222B\u2080\u00B3(2x\u2212x\u00B2)dx = <strong>9/2</strong>'},
+];
+function showStepAnim(idx){
+  const c=$('s2-steps'); if(idx===0)c.innerHTML=''; if(idx>=solutionSteps.length)return;
+  const d=document.createElement('div'); d.className='s2-step';
+  d.innerHTML=`<div class="s2-step-num">${idx+1}</div><div class="s2-step-text">${solutionSteps[idx].text}</div>`;
+  c.appendChild(d); setTimeout(()=>d.classList.add('show'),100);
+}
+
+// ══ SCREEN 3: Template Library ══
+const catColors = ['#4CAF50','#FF9800','#2196F3','#9C27B0','#009688','#795548','#607D8B'];
+const categories=[
+  {name:'数学',count:486,color:catColors[0],templates:[
+    {name:'函数图像生成器',views:'12.8k',tag:'高中',bg:'#E8F5E9'},
+    {name:'三角函数动画',views:'9.4k',tag:'高中',bg:'#E8F5E9'},
+    {name:'圆锥曲线交互',views:'8.7k',tag:'高中',bg:'#E8F5E9'},
+    {name:'概率统计可视化',views:'7.2k',tag:'高中',bg:'#E8F5E9'},
+    {name:'向量运算动画',views:'6.5k',tag:'高中',bg:'#E8F5E9'},
+    {name:'极限与导数',views:'5.9k',tag:'高中',bg:'#E8F5E9'},
+  ]},
+  {name:'化学',count:342,color:catColors[1],templates:[
+    {name:'分子结构3D',views:'11.2k',tag:'高中',bg:'#FFF3E0'},
+    {name:'化学反应动画',views:'8.9k',tag:'初中',bg:'#FFF3E0'},
+    {name:'电子云模型',views:'7.1k',tag:'高中',bg:'#FFF3E0'},
+    {name:'溶液浓度模拟',views:'5.8k',tag:'初中',bg:'#FFF3E0'},
+    {name:'氧化还原演示',views:'6.3k',tag:'高中',bg:'#FFF3E0'},
+    {name:'有机反应机理',views:'4.9k',tag:'高中',bg:'#FFF3E0'},
+  ]},
+  {name:'物理',count:398,color:catColors[2],templates:[
+    {name:'波动与光学',views:'10.5k',tag:'高中',bg:'#E3F2FD'},
+    {name:'电路模拟器',views:'9.8k',tag:'初中',bg:'#E3F2FD'},
+    {name:'抛体运动交互',views:'8.3k',tag:'高中',bg:'#E3F2FD'},
+    {name:'电磁场可视化',views:'7.6k',tag:'高中',bg:'#E3F2FD'},
+    {name:'力学分析器',views:'6.9k',tag:'高中',bg:'#E3F2FD'},
+    {name:'热力学模拟',views:'5.4k',tag:'高中',bg:'#E3F2FD'},
+  ]},
+  {name:'生物',count:276,color:catColors[3],templates:[
+    {name:'DNA复制动画',views:'9.1k',tag:'高中',bg:'#F3E5F5'},
+    {name:'细胞分裂过程',views:'8.4k',tag:'初中',bg:'#F3E5F5'},
+    {name:'人体循环系统',views:'7.7k',tag:'初中',bg:'#F3E5F5'},
+    {name:'光合作用模拟',views:'6.8k',tag:'高中',bg:'#F3E5F5'},
+    {name:'神经传导动画',views:'5.5k',tag:'高中',bg:'#F3E5F5'},
+    {name:'基因表达过程',views:'4.8k',tag:'高中',bg:'#F3E5F5'},
+  ]},
+  {name:'地理',count:189,color:catColors[4],templates:[
+    {name:'板块运动模拟',views:'6.2k',tag:'高中',bg:'#E0F2F1'},
+    {name:'气候系统动画',views:'5.5k',tag:'初中',bg:'#E0F2F1'},
+    {name:'地质构造交互',views:'4.8k',tag:'高中',bg:'#E0F2F1'},
+    {name:'水循环演示',views:'4.2k',tag:'初中',bg:'#E0F2F1'},
+    {name:'等高线绘制',views:'3.9k',tag:'高中',bg:'#E0F2F1'},
+    {name:'洋流系统',views:'3.5k',tag:'高中',bg:'#E0F2F1'},
+  ]},
+  {name:'历史',count:156,color:catColors[5],templates:[
+    {name:'朝代版图演变',views:'8.3k',tag:'初中',bg:'#EFEBE9'},
+    {name:'战役推演动画',views:'5.7k',tag:'高中',bg:'#EFEBE9'},
+    {name:'文明发展时间线',views:'4.9k',tag:'初中',bg:'#EFEBE9'},
+    {name:'丝绸之路交互',views:'4.2k',tag:'初中',bg:'#EFEBE9'},
+    {name:'重大事件链',views:'3.8k',tag:'高中',bg:'#EFEBE9'},
+    {name:'建筑风格对比',views:'3.3k',tag:'高中',bg:'#EFEBE9'},
+  ]},
+  {name:'英语',count:124,color:catColors[6],templates:[
+    {name:'语法结构可视化',views:'5.8k',tag:'高中',bg:'#ECEFF1'},
+    {name:'发音口型动画',views:'4.7k',tag:'初中',bg:'#ECEFF1'},
+    {name:'词根词缀树',views:'4.2k',tag:'高中',bg:'#ECEFF1'},
+    {name:'情景对话模拟',views:'3.6k',tag:'初中',bg:'#ECEFF1'},
+    {name:'作文结构引导',views:'3.1k',tag:'高中',bg:'#ECEFF1'},
+    {name:'时态变化动画',views:'2.8k',tag:'初中',bg:'#ECEFF1'},
+  ]},
+];
+
+function renderCategories(idx){
+  const c=$('s3-categories'); c.innerHTML='';
+  categories.forEach((cat,i)=>{
+    const d=document.createElement('div'); d.className='s3-cat'+(i===idx?' active':'');
+    d.innerHTML=`<span class="s3-cat-dot" style="background:${cat.color}"></span>${cat.name}<span class="s3-cat-count">${cat.count}</span>`;
+    c.appendChild(d);
+  });
+}
+function renderTemplates(idx){
+  const cat=categories[idx];
+  $('s3-grid-title').innerHTML=`${cat.name}动画模板 <span class="s3-grid-count">${cat.count} 个模板</span>`;
+  const g=$('s3-grid'); g.innerHTML='';
+  cat.templates.forEach((t,i)=>{
+    const d=document.createElement('div'); d.className='s3-card';
+    d.innerHTML=`
+      <div class="s3-card-preview" style="background:${t.bg};">
+        <div class="preview-icon" style="background:${cat.color}22;"><svg viewBox="0 0 24 24" fill="none" stroke="${cat.color}" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></div>
+      </div>
+      <div class="s3-card-info">
+        <div class="s3-card-name">${t.name}</div>
+        <div class="s3-card-meta"><span>${t.views} 次使用</span><span class="s3-card-badge">${t.tag}</span></div>
+      </div>`;
+    g.appendChild(d);
+    setTimeout(()=>d.classList.add('show'),100+i*80);
+  });
+}
+
+// ══ Main Animation ══
+async function mainAnimation(){
+  const msg=$('s1-messages');
+  msg.innerHTML='';
+
+  // 直接点击输入框
+  await wait(600);
+  const inputBox=$('s1-input-box');
+  moveCursor(400, 455);
+  await wait(500);
+  showClick(400, 455);
+  await wait(300);
+
+  // 打字
+  await typeInput(inputBox, '出一道数形结合题目');
+  await wait(400);
+
+  // 点击发送
+  const sendBtn=$('s1-send');
+  moveCursor(690, 455);
+  await wait(350);
+  showClick(690, 455);
+  sendBtn.classList.add('active');
+  await wait(200);
+  inputBox.innerHTML='<span class="placeholder">输入教学需求...</span>';
+  inputBox.classList.remove('focused','has-text');
+  sendBtn.classList.remove('active');
+
+  await addMessage(msg,'user','出一道数形结合题目');
+  await wait(500);
+
+  // AI 回复 — LaTeX 风格
+  hideCursor();
+  const botDiv=document.createElement('div');
+  botDiv.className='s1-msg s1-msg-bot';
+  botDiv.innerHTML=`<div class="s1-msg-avatar">${botAvatarSVG}</div><div class="s1-msg-bubble"></div>`;
+  msg.appendChild(botDiv);
+  await wait(150);
+  botDiv.classList.add('show');
+  const bubble=botDiv.querySelector('.s1-msg-bubble');
+  await wait(400);
+
+  // Type intro text then show math block
+  await typeText(bubble,'已为您生成题目：',20);
+  await wait(200);
+
+  const mathBlock=document.createElement('div');
+  mathBlock.className='math-block';
+  mathBlock.innerHTML=`
+    <div class="math-label">PROBLEM</div>
+    <div>已知抛物线 <span class="math-eq"><span class="math-var">y</span> = <span class="math-var">x</span><sup>2</sup> &minus; 4</span> 与直线 <span class="math-eq"><span class="math-var">y</span> = 2<span class="math-var">x</span> &minus; 4</span> 交于两点 <span class="math-var">A</span>、<span class="math-var">B</span>，求由抛物线与直线所围成的封闭区域的面积 <span class="math-var">S</span>。</div>
+    <div class="math-meta"><span>难度：中等偏上</span><span>知识点：数形结合 · 定积分</span></div>`;
+  mathBlock.style.opacity='0'; mathBlock.style.transform='translateY(8px)';
+  bubble.appendChild(mathBlock);
+  await wait(100);
+  mathBlock.style.transition='all .4s ease';
+  mathBlock.style.opacity='1'; mathBlock.style.transform='translateY(0)';
+
+  await wait(800);
+
+  // 生成可视化按钮
+  const vizBtn=document.createElement('div');
+  vizBtn.className='s2-interact-btn pulse';
+  vizBtn.textContent='生成可视化动画 →';
+  bubble.appendChild(vizBtn);
+  await wait(1000);
+
+  // 点击按钮
+  moveCursor(460, 390);
+  await wait(500);
+  showClick(460, 390);
+  await wait(300);
+
+  // ── Screen 2 ──
+  hideCursor();
+  $('s2-question-text').innerHTML='已知 <i>y</i> = <i>x</i><sup>2</sup> &minus; 4 与 <i>y</i> = 2<i>x</i> &minus; 4 交于 A、B，求围成面积 <i>S</i>';
+  $('s2-steps').innerHTML='';
+  switchScreen('screen2');
+  await wait(500);
+  initMathCanvas();
+  await wait(400);
+  window.vizStart();
+  await wait(5500);
+
+  await wait(1500);
+
+  // ── Back to Screen 1, click 动画模板库 ──
+  switchScreen('screen1');
+  await wait(300);
+  moveCursor(85, 250);
+  await wait(500);
+  showClick(85, 250);
+  await wait(400);
+
+  // ── Screen 3 ──
+  hideCursor();
+  switchScreen('screen3');
+  renderCategories(0);
+  renderTemplates(0);
+  await wait(1800);
+
+  for(const ci of [1,2,3,4,5,6]){
+    moveCursor(75, 50+ci*32);
+    await wait(450);
+    showClick(75, 50+ci*32);
+    renderCategories(ci);
+    renderTemplates(ci);
+    await wait(1100);
+  }
+
+  hideCursor();
+  await wait(2000);
+
+  switchScreen('screen1');
+  await wait(500);
+  mainAnimation();
+}
+
+setTimeout(()=>mainAnimation(), 600);
+</script>
+</body>
+</html>

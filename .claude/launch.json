@@ -4,7 +4,7 @@
     {
       "name": "维度之门官网",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["server.py"],
+      "runtimeArgs": ["-m", "http.server", "5000"],
       "port": 5000
     }
   ]
