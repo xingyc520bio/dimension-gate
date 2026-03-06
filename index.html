@@ -179,6 +179,10 @@
     .feat-title { font-size: .9rem; font-weight: 600; margin-bottom: 4px; color: #0A2342; }
     .feat-desc { font-size: .8rem; color: rgba(10,35,66,.42); line-height: 1.6; }
 
+    /* ── DEMO EMBED ── */
+    .demo-embed { position:relative; width:100%; border-radius:12px; overflow:hidden; box-shadow:0 8px 30px rgba(0,90,200,.08); border:1px solid #E2E8F0; aspect-ratio:900/540; }
+    .demo-iframe { width:900px; height:540px; border:none; display:block; transform-origin:top left; transform:scale(var(--demo-scale,0.6)); }
+
     /* ── CASES ── */
     #cases { background: var(--bg-dark); }
     .cases-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 52px; }
@@ -531,11 +535,9 @@
         <div class="prod-tagline cn-only">「一个 Agent，服务全球客户，说他们的母语。」</div>
         <div class="prod-tagline en-only">"One Agent, serving global customers, in their native language."</div>
       </div>
-      <ul class="feat-list">
-        <li><div class="feat-ic">🌍</div><div><div class="feat-title cn-only">30+ 语言实时互通</div><div class="feat-title en-only">30+ Languages in Real-Time</div><div class="feat-desc cn-only">支持中、英、日、韩、法、德、西、阿拉伯语等 30+ 语种，自动识别客户语言并用母语流畅对话</div><div class="feat-desc en-only">Auto-detects customer language and responds fluently in 30+ languages including EN, JP, KR, FR, DE, ES, AR</div></div></li>
-        <li><div class="feat-ic">💬</div><div><div class="feat-title cn-only">跨语言多轮对话 + 意图识别</div><div class="feat-title en-only">Cross-Lingual Dialogue & Intent</div><div class="feat-desc cn-only">客户中途切换语言也能无缝衔接，跨轮记忆上下文，智能判断何时转人工</div><div class="feat-desc en-only">Seamless mid-conversation language switching, cross-turn memory, smart escalation</div></div></li>
-        <li><div class="feat-ic">🔗</div><div><div class="feat-title cn-only">全球主流平台接入</div><div class="feat-title en-only">Global Platform Integration</div><div class="feat-desc cn-only">Shopify、Amazon、TikTok Shop、WhatsApp、LINE、Telegram、企业微信等全渠道，1 周上线</div><div class="feat-desc en-only">Shopify, Amazon, TikTok Shop, WhatsApp, LINE, Telegram, WeChat Work — live in 1 week</div></div></li>
-      </ul>
+      <div class="demo-embed">
+        <iframe src="demo-cs.html" class="demo-iframe" loading="lazy" title="AI 跨境客服实时演示"></iframe>
+      </div>
     </div>
 
     <div class="tab-pane" id="tab-edu">
@@ -948,6 +950,19 @@ function switchTab(id,btn){
   else document.querySelectorAll('.tab-btn')[['cs','edu','mfg','ceo','bid'].indexOf(id)].classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
 }
+
+/* ── DEMO IFRAME SCALING ── */
+(function(){
+  function scaleDemo(){
+    const wrap=document.querySelector('.demo-embed');
+    if(!wrap)return;
+    const w=wrap.clientWidth;
+    const s=w/900;
+    wrap.style.setProperty('--demo-scale',s);
+  }
+  scaleDemo();
+  window.addEventListener('resize',scaleDemo);
+})();
 
 /* ── CHECKBOX ── */
 function toggleChk(label){label.classList.toggle('checked');}
