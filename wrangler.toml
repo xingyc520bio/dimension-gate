@@ -5,4 +5,4 @@ compatibility_date = "2024-12-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "dimension-gate-db"
-database_id = "替换为你的D1数据库ID"
+database_id = "e1f63a01-92e6-434a-abe6-76f1e77cca5a"
