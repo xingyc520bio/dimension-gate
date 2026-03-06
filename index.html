@@ -499,8 +499,8 @@
     <div class="fade-in">
       <div class="section-label cn-only">04 · 产品与服务</div>
       <div class="section-label en-only">04 · Products & Services</div>
-      <h2 class="section-title cn-only">三大业务线，深耕垂直场景</h2>
-      <h2 class="section-title en-only" style="font-family:'Syne',sans-serif;">Three Verticals. One Mission.</h2>
+      <h2 class="section-title cn-only">四大业务线，深耕垂直场景</h2>
+      <h2 class="section-title en-only" style="font-family:'Syne',sans-serif;">Four Verticals. One Mission.</h2>
       <p class="section-desc cn-only">拒绝通用大模型直接套用，每一个 Agent 都为您的行业量身打造。</p>
       <p class="section-desc en-only">No generic chatbot wrappers. Every Agent is purpose-built for your industry.</p>
     </div>
@@ -508,6 +508,7 @@
       <button class="tab-btn active" onclick="switchTab('cs',this)">🤖 <span class="cn-only">AI 智能客服</span><span class="en-only">AI Customer Service</span></button>
       <button class="tab-btn" onclick="switchTab('edu',this)">🎓 <span class="cn-only">教育 Agent</span><span class="en-only">Education Agent</span></button>
       <button class="tab-btn" onclick="switchTab('mfg',this)">🏭 <span class="cn-only">制造业优化</span><span class="en-only">Manufacturing</span></button>
+      <button class="tab-btn" onclick="switchTab('ceo',this)">👔 <span class="cn-only">董事长助理 Agent</span><span class="en-only">Executive Assistant</span></button>
     </div>
 
     <div class="tab-pane active" id="tab-cs">
@@ -589,6 +590,32 @@
         <li><div class="feat-ic">📅</div><div><div class="feat-title cn-only">智能排程 Agent</div><div class="feat-title en-only">Smart Scheduling Agent</div><div class="feat-desc cn-only">自动读取 ERP/MES 数据，减少人工协调 80%</div><div class="feat-desc en-only">Auto-reads ERP/MES data, reduces coordination by 80%</div></div></li>
         <li><div class="feat-ic">🔍</div><div><div class="feat-title cn-only">质检 AI 辅助</div><div class="feat-title en-only">AI Quality Inspection</div><div class="feat-desc cn-only">视觉识别 + 行业知识库，快速判定，降低漏检率</div><div class="feat-desc en-only">Vision recognition + knowledge base — faster QC, fewer misses</div></div></li>
         <li><div class="feat-ic">📱</div><div><div class="feat-title cn-only">流程数字化 Agent</div><div class="feat-title en-only">Process Digitization Agent</div><div class="feat-desc cn-only">将口头/纸质 SOP 转化为可追踪数字流程</div><div class="feat-desc en-only">Converts verbal/paper SOPs to trackable digital workflows</div></div></li>
+      </ul>
+    </div>
+
+    <div class="tab-pane" id="tab-ceo">
+      <div>
+        <div class="prod-icon">👔</div>
+        <div class="prod-title cn-only">董事长助理 Agent</div>
+        <div class="prod-title en-only" style="font-family:'Syne',sans-serif;">Executive Assistant Agent</div>
+        <div class="prod-pain">
+          <div class="plabel">PAIN POINT</div>
+          <p class="cn-only">高管时间极其稀缺，信息过载严重；PPT 汇报材料依赖人工、耗时长；行业动态追踪碎片化，错过关键信号。</p>
+          <p class="en-only">Executives are time-starved with information overload; presentation prep is manual and slow; industry trends tracking is fragmented.</p>
+        </div>
+        <div class="prod-tags">
+          <span class="tag cn-only">企业高管</span><span class="tag en-only">C-Suite</span>
+          <span class="tag cn-only">战略决策</span><span class="tag en-only">Strategic Planning</span>
+          <span class="tag cn-only">投资机构</span><span class="tag en-only">Investment Firms</span>
+          <span class="tag cn-only">集团总部</span><span class="tag en-only">Corporate HQ</span>
+        </div>
+        <div class="prod-tagline cn-only">「让 AI 成为你最高效的幕僚长。」</div>
+        <div class="prod-tagline en-only">"Let AI be your most efficient chief of staff."</div>
+      </div>
+      <ul class="feat-list">
+        <li><div class="feat-ic">📊</div><div><div class="feat-title cn-only">一键生成汇报 PPT</div><div class="feat-title en-only">One-Click Report PPT</div><div class="feat-desc cn-only">输入主题或数据，自动生成专业级公司产品介绍、经营汇报、融资路演 PPT</div><div class="feat-desc en-only">Input a topic or data, auto-generate professional presentations for products, operations, or fundraising</div></div></li>
+        <li><div class="feat-ic">📰</div><div><div class="feat-title cn-only">每日行业资讯推荐</div><div class="feat-title en-only">Daily Industry Briefing</div><div class="feat-desc cn-only">每日自动抓取、筛选、摘要行业最新政策、竞品动态、技术趋势，推送个性化早报</div><div class="feat-desc en-only">Auto-curated daily briefing: policies, competitor moves, tech trends — personalized to your industry</div></div></li>
+        <li><div class="feat-ic">🗂️</div><div><div class="feat-title cn-only">智能决策辅助</div><div class="feat-title en-only">Decision Intelligence</div><div class="feat-desc cn-only">整合内部数据与外部情报，快速生成分析报告与决策建议，辅助高管高效拍板</div><div class="feat-desc en-only">Combines internal data with market intelligence to generate actionable insights for faster decisions</div></div></li>
       </ul>
     </div>
   </div>
@@ -807,6 +834,8 @@
         <a href="#products" onclick="switchTab('edu')" class="en-only">Education Agent</a>
         <a href="#products" onclick="switchTab('mfg')" class="cn-only">制造业优化</a>
         <a href="#products" onclick="switchTab('mfg')" class="en-only">Manufacturing</a>
+        <a href="#products" onclick="switchTab('ceo')" class="cn-only">董事长助理 Agent</a>
+        <a href="#products" onclick="switchTab('ceo')" class="en-only">Executive Assistant</a>
       </div>
       <div class="footer-col">
         <h5 class="cn-only">联系我们</h5>
@@ -887,7 +916,7 @@ function switchTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  else document.querySelectorAll('.tab-btn')[['cs','edu','mfg'].indexOf(id)].classList.add('active');
+  else document.querySelectorAll('.tab-btn')[['cs','edu','mfg','ceo'].indexOf(id)].classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
 }
 
